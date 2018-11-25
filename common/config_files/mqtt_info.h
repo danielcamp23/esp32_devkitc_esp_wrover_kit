@@ -55,6 +55,32 @@ static const char MQTT_BROKER_ENDPOINT[] = "Paste AWS IoT Broker endpoint here."
  */
 #define GREENGRASS_DISCOVERY_PORT 8443
 
+#define MQTT_SUBSCRIBE_TOPIC    ( ( const uint8_t * ) "freertos/demos/echo" )
+
+#define MQTT_PUBLISH_TOPIC      ( ( const uint8_t * ) "freertos/demos/echo2" )
+
+/* Timeout used when performing MQTT operations that do not need extra time
+to perform a TLS negotiation. */
+#define MQTT_TIMEOUT            pdMS_TO_TICKS( 3000 )
+
+/* Send AWS IoT MQTT traffic encrypted to destination port 443. */
+#define MQTT_AGENT_CONNECT_FLAGS                 ( mqttagentREQUIRE_TLS | mqttagentUSE_AWS_IOT_ALPN_443 )
+
+/* Timeout used when establishing a connection, which required TLS
+* negotiation. */
+#define MQTT_ECHO_TLS_NEGOTIATION_TIMEOUT        pdMS_TO_TICKS( 12000 )
+
+/**
+ * It must be unique per MQTT broker.
+ */
+#define MQTT_CLIENT_ID            ( ( const uint8_t * ) "MQTTEcho" )
+
+/**
+ * @brief Dimension of the character array buffers used to hold data (strings in
+ * this case) that is published to and received from the MQTT broker (in the cloud).
+ */
+#define MQTT_MAX_DATA_LENGTH      20
+
 
 #endif
 

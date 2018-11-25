@@ -2,6 +2,7 @@
 #include "mqtt_config_static.h"
 #include "mqtt_info.h"
 #include "task_config.h"
+#include "flags.h"
 
 #include "string.h"
 #include "stdio.h"
@@ -12,8 +13,9 @@
 #include "aws_mqtt_agent.h"
 #include "aws_hello_world.h"
 
-#include "aws_hello_world.h"
-//#include "FreeRTOSConfig.h"
+
+static MQTTAgentHandle_t xMQTTHandle = NULL;
+static MessageBufferHandle_t xEchoMessageBuffer = NULL;
 
 
 void mqtt_config_init(void * param){
@@ -28,55 +30,29 @@ void mqtt_config_task(void * pvParameters){
     TaskHandle_t xEchoingTask = NULL;
 
     ( void ) pvParameters;
+    printf("MQTT created\n");
+    for(;;){
+        if(flags_is_wifi_connected()){
+            break;
+        }
+
+        vTaskDelay(5000 / portTICK_PERIOD_MS);
+    }
+
+    printf("MQTT after WIFI\n");
 
     /* Create the MQTT client object and connect it to the MQTT broker. */
     xReturned = mqtt_config_connect_to_broker();
 
+
     if( xReturned == pdPASS ){
-        /* Create the task that echoes data received in the callback back to the
-         * MQTT broker. */
-        xReturned = xTaskCreate( prvMessageEchoingTask,               /* The function that implements the task. */
-                                 "Echoing",                           /* Human readable name for the task. */
-                                 democonfigMQTT_ECHO_TASK_STACK_SIZE, /* Size of the stack to allocate for the task, in words not bytes! */
-                                 NULL,                                /* The task parameter is not used. */
-                                 tskIDLE_PRIORITY,                    /* Runs at the lowest priority. */
-                                 &( xEchoingTask ) );                 /* The handle is stored so the created task can be deleted again at the end of the demo. */
-
-        if( xReturned != pdPASS )
-        {
-            /* The task could not be created because there was insufficient FreeRTOS
-             * heap available to create the task's data structures and/or stack. */
-            configPRINTF( ( "MQTT echoing task could not be created - out of heap space?\r\n" ) );
-        }
-    }
-    else
-    {
-        configPRINTF( ( "MQTT echo test could not connect to broker.\r\n" ) );
-    }
-
-    if( xReturned == pdPASS )
-    {
         configPRINTF( ( "MQTT echo test echoing task created.\r\n" ) );
-
-        /* Subscribe to the echo topic. */
-        xReturned = prvSubscribe();
+        xReturned = mqtt_config_subcribe();
     }
 
-    if( xReturned == pdPASS )
-    {
-        /* MQTT client is now connected to a broker.  Publish a message
-         * every five seconds until a minute has elapsed. */
-        for( xX = 0; xX < xIterationsInAMinute; xX++ )
-        {
-            prvPublishNextMessage( xX );
-
-            /* Five seconds delay between publishes. */
-            vTaskDelay( xFiveSeconds );
-        }
-    }
 
     /* Disconnect the client. */
-    ( void ) MQTT_AGENT_Disconnect( xMQTTHandle, democonfigMQTT_TIMEOUT );
+    ( void ) MQTT_AGENT_Disconnect( xMQTTHandle, MQTT_TIMEOUT );
 
     /* End the demo by deleting all created resources. */
     configPRINTF( ( "MQTT echo demo finished.\r\n" ) );
@@ -93,10 +69,10 @@ static BaseType_t mqtt_config_connect_to_broker( void )
     MQTTAgentConnectParams_t xConnectParameters =
     {
         MQTT_BROKER_ENDPOINT, /* The URL of the MQTT broker to connect to. */
-        democonfigMQTT_AGENT_CONNECT_FLAGS,   /* Connection flags. */
+        MQTT_AGENT_CONNECT_FLAGS,             /* Connection flags. */
         pdFALSE,                              /* Deprecated. */
         MQTT_BROKER_PORT,                     /* Port number on which the MQTT broker is listening. Can be overridden by ALPN connection flag. */
-        echoCLIENT_ID,                        /* Client Identifier of the MQTT client. It should be unique per broker. */
+        MQTT_CLIENT_ID,                       /* Client Identifier of the MQTT client. It should be unique per broker. */
         0,                                    /* The length of the client Id, filled in later as not const. */
         pdFALSE,                              /* Deprecated. */
         NULL,                                 /* User data supplied to the callback. Can be NULL. */
@@ -118,13 +94,13 @@ static BaseType_t mqtt_config_connect_to_broker( void )
         /* Fill in the MQTTAgentConnectParams_t member that is not const,
          * and therefore could not be set in the initializer (where
          * xConnectParameters is declared in this function). */
-        xConnectParameters.usClientIdLength = ( uint16_t ) strlen( ( const char * ) echoCLIENT_ID );
+        xConnectParameters.usClientIdLength = ( uint16_t ) strlen( ( const char * ) MQTT_CLIENT_ID );
 
         /* Connect to the broker. */
-        configPRINTF( ( "MQTT echo attempting to connect to %s.\r\n", clientcredentialMQTT_BROKER_ENDPOINT ) );
+        configPRINTF( ( "MQTT echo attempting to connect to %s.\r\n", MQTT_BROKER_ENDPOINT ) );
         xReturned = MQTT_AGENT_Connect( xMQTTHandle,
                                         &xConnectParameters,
-                                        democonfigMQTT_ECHO_TLS_NEGOTIATION_TIMEOUT );
+                                        MQTT_ECHO_TLS_NEGOTIATION_TIMEOUT );
 
         if( xReturned != eMQTTAgentSuccess )
         {
@@ -140,4 +116,87 @@ static BaseType_t mqtt_config_connect_to_broker( void )
     }
 
     return xReturn;
+}
+
+
+static BaseType_t mqtt_config_subcribe(void){
+    MQTTAgentReturnCode_t xReturned;
+    BaseType_t xReturn;
+    MQTTAgentSubscribeParams_t xSubscribeParams;
+
+    /* Setup subscribe parameters to subscribe to MQTT_SUBSCRIBE_TOPIC topic. */
+    xSubscribeParams.pucTopic = MQTT_SUBSCRIBE_TOPIC;
+    xSubscribeParams.pvPublishCallbackContext = NULL;
+    xSubscribeParams.pxPublishCallback = mqtt_config_subs_callback;
+    xSubscribeParams.usTopicLength = ( uint16_t ) strlen( ( const char * ) MQTT_SUBSCRIBE_TOPIC );
+    xSubscribeParams.xQoS = eMQTTQoS1;
+
+    /* Subscribe to the topic. */
+    xReturned = MQTT_AGENT_Subscribe( xMQTTHandle,
+                                      &xSubscribeParams,
+                                      MQTT_TIMEOUT );
+
+    if( xReturned == eMQTTAgentSuccess )
+    {
+        configPRINTF( ( "MQTT Echo demo subscribed to %s\r\n", MQTT_SUBSCRIBE_TOPIC ) );
+        xReturn = pdPASS;
+    }
+    else
+    {
+        configPRINTF( ( "ERROR:  MQTT Echo demo could not subscribe to %s\r\n", MQTT_SUBSCRIBE_TOPIC ) );
+        xReturn = pdFAIL;
+    }
+
+    return xReturn;
+}
+
+static MQTTBool_t mqtt_config_subs_callback(void * pvUserData, const MQTTPublishData_t * const pxCallbackParams){
+    char cBuffer[ MQTT_MAX_DATA_LENGTH];
+    uint32_t ulBytesToCopy = ( MQTT_MAX_DATA_LENGTH - 1 ); /* Bytes to copy initialized to ensure it
+                                                                                   * fits in the buffer. One place is left
+                                                                                   * for NULL terminator. */
+
+    /* Remove warnings about the unused parameters. */
+    ( void ) pvUserData;
+
+    /* Don't expect the callback to be invoked for any other topics. */
+    configASSERT( ( size_t ) ( pxCallbackParams->usTopicLength ) == strlen( ( const char * ) MQTT_SUBSCRIBE_TOPIC ) );
+    configASSERT( memcmp( pxCallbackParams->pucTopic, MQTT_SUBSCRIBE_TOPIC, ( size_t ) ( pxCallbackParams->usTopicLength ) ) == 0 );
+
+    /* THe ulBytesToCopy has already been initialized to ensure it does not copy
+     * more bytes than will fit in the buffer.  Now check it does not copy more
+     * bytes than are available. */
+    if( pxCallbackParams->ulDataLength <= ulBytesToCopy ){
+        ulBytesToCopy = pxCallbackParams->ulDataLength;
+
+        /* Set the buffer to zero and copy the data into the buffer to ensure
+         * there is a NULL terminator and the buffer can be accessed as a
+         * string. */
+        memset( cBuffer, 0x00, sizeof( cBuffer ) );
+        memcpy( cBuffer, pxCallbackParams->pvData, ( size_t ) ulBytesToCopy );
+
+        /* Only echo the message back if it has not already been echoed.  If the
+         * data has already been echoed then it will already contain the echoACK_STRING
+         * string. */
+        printf("Data received: %s\n", cBuffer);
+        //if( strstr( cBuffer, echoACK_STRING ) == NULL ){
+        //    /* The string has not been echoed before, so send it to the publish
+        //     * task, which will then echo the data back.  Make sure to send the
+        //     * terminating null character as well so that the received buffer in
+        //     * EchoingTask can be printed as a C string.  THE DATA CANNOT BE ECHOED
+        //     * BACK WITHIN THE CALLBACK AS THE CALLBACK IS EXECUTING WITHINT THE
+        //     * CONTEXT OF THE MQTT TASK.  Calling an MQTT API function here could cause
+        //     * a deadlock. */
+        //    ( void ) xMessageBufferSend( xEchoMessageBuffer, cBuffer, ( size_t ) ulBytesToCopy + ( size_t ) 1, echoDONT_BLOCK );
+        //}
+    }
+    else{
+        configPRINTF( ( "[WARN]: Dropping received message as it does not fit in the buffer.\r\n" ) );
+    }
+
+    /* The data was copied into the FreeRTOS message buffer, so the buffer
+     * containing the data is no longer required.  Returning eMQTTFalse tells the
+     * MQTT agent that the ownership of the buffer containing the message lies with
+     * the agent and it is responsible for freeing the buffer. */
+    return eMQTTFalse;
 }

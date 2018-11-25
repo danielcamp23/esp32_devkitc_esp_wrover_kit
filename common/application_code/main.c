@@ -27,21 +27,10 @@
 #include "FreeRTOS.h"
 #include "task.h"
 
-
-
-/* AWS System includes. */
-#include "aws_system_init.h"
 #include "aws_logging_task.h"
-#include "aws_wifi.h"
-#include "aws_clientcredential.h"
-#include "nvs_flash.h"
-#include "FreeRTOS_IP.h"
-#include "FreeRTOS_Sockets.h"
+#include "aws_system_init.h"
 
 
-
-/* Application version info. */
-#include "aws_application_version.h"
 
 #include "task_config.h"
 #include "flags.h"
@@ -57,8 +46,9 @@
 #define mainDEVICE_NICK_NAME                "AcuaMatic"
 
 int app_main( void ){
-
-    
+    flags_init();
+    nvs_storage_init();
+    spiffs_storage_init();
     xLoggingTaskInitialize( mainLOGGING_TASK_STACK_SIZE,
 							tskIDLE_PRIORITY + 5,
 							mainLOGGING_MESSAGE_QUEUE_LENGTH );
@@ -67,12 +57,10 @@ int app_main( void ){
     /*
 
     */
-    flags_init();
-    nvs_storage_init();
-    spiffs_storage_init();
     authentication_init();
-    wifi_config_init();
     mqtt_config_init();
+    wifi_config_init();
+    
 
     ( void ) xTaskCreate( wifi_config_task,
                           TASK_WIFI_NAME,
@@ -81,12 +69,13 @@ int app_main( void ){
                           TASK_WIFI_PRIORITY,
                           NULL );
 
+    
     ( void ) xTaskCreate( mqtt_config_task,
                           TASK_MQTT_SUBS_NAME,
                           TASK_MQTT_SUBS_STACK_SIZE,
                           NULL,
                           TASK_MQTT_SUBS_PRIORITY,
                           NULL );                          
-
+    
     return 0;
 }

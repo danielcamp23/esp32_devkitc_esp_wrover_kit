@@ -2,12 +2,12 @@
 
 #include "wifi_config.h"
 #include "wifi_info.h"
+#include "flags.h"
 /* FreeRTOS includes. */
 #include "FreeRTOS.h"
 #include "task.h"
 
-/* Demo includes */
-#include "aws_demo_runner.h"
+
 #include "aws_dev_mode_key_provisioning.h"
 
 /* AWS System includes. */
@@ -285,6 +285,13 @@ void wifi_config_init(){
             ucGatewayAddress,
             ucDNSServerAddress,
             ucMACAddress );
+
+    if(SYSTEM_Init() == pdPASS){
+        printf("SYSTEM_Init OK\n");
+    }
+    else{
+        printf("SYSTEM_Init Fail\n");
+    }
 }
 
 
@@ -295,7 +302,7 @@ void wifi_config_task(void * pvParameters){
     int ctr_connect = 0;
     bool connected = false;
     bool connecting = false;
-
+    
     ( void ) pvParameters;
     
     xWifiStatus = WIFI_On();
@@ -314,11 +321,13 @@ void wifi_config_task(void * pvParameters){
     for(;;){
         if(!connected && !connecting){
             ctr_connect = 0;
+            printf("connecting to: %s - %s\n", WIFI_SSID, WIFI_PASSWORD);
             xWifiStatus = WIFI_ConnectAP( &( xNetworkParams ) );
             if( xWifiStatus == eWiFiSuccess ){
                 connected = true;
                 connecting = false; 
                 configPRINTF( ( "WiFi connected!\r\n") );
+                flags_set_wifi_connected();
             }
             else{
                 configPRINTF( ( "Unable to CONNECT...\r\n" ) );

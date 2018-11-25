@@ -21,3 +21,16 @@ bool flags_is_nvs_ok(){
 void flags_set_nvs_ok(){
     CONTROL_FLAGS.nvs = 1;
 }
+
+bool flags_is_wifi_connected(){
+        if(CONTROL_FLAGS.wifi_connected){
+        return true;
+    }
+    else{
+        return false;
+    }
+}
+
+void flags_set_wifi_connected(){
+    CONTROL_FLAGS.wifi_connected = 1;
+}

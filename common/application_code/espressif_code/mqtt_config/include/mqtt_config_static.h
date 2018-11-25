@@ -2,7 +2,15 @@
 #define _MQTT_CONFIG_STATIC_H_
 
 #include "FreeRTOS.h"
+#include "aws_mqtt_agent.h"
 
 static BaseType_t mqtt_config_connect_to_broker( void );
+
+static BaseType_t mqtt_config_subcribe(void);
+
+/*
+ * Función callback cuando el cliente recibe datos del broker     
+ */
+static MQTTBool_t mqtt_config_subs_callback(void * pvUserData, const MQTTPublishData_t * const pxCallbackParams);
 
 #endif

@@ -147,8 +147,7 @@ int app_main( void )
             ucDNSServerAddress,
             ucMACAddress );
 
-    if( SYSTEM_Init() == pdPASS )
-    {
+    if( SYSTEM_Init() == pdPASS ){
         /* Connect to the wifi before running the demos */
         prvWifiConnect();
 

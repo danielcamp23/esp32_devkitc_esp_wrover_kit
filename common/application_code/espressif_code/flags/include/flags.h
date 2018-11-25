@@ -7,9 +7,10 @@ typedef unsigned int boolean_t;
 
 typedef union {
     struct{
-        boolean_t nvs : 1;
-        boolean_t spiffs : 1;
-        int not_used : 30;        
+        boolean_t nvs :             1;
+        boolean_t spiffs :          1;
+        boolean_t wifi_connected :  1;
+        int not_used :              30;        
     };
     int raw_flags;
 } flags_t;
@@ -21,5 +22,10 @@ void flags_init();
 bool flags_is_nvs_ok();
 
 void flags_set_nvs_ok();
+
+
+bool flags_is_wifi_connected();
+
+void flags_set_wifi_connected();
 
 #endif
