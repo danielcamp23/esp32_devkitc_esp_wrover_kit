@@ -70,6 +70,7 @@ int app_main( void ){
                           NULL );
 
     
+    /*
     ( void ) xTaskCreate( mqtt_config_task,
                           TASK_MQTT_SUBS_NAME,
                           TASK_MQTT_SUBS_STACK_SIZE,
@@ -77,5 +78,6 @@ int app_main( void ){
                           TASK_MQTT_SUBS_PRIORITY,
                           NULL );                          
     
+    */
     return 0;
 }
