@@ -69,6 +69,8 @@ int app_main( void ){
                           TASK_WIFI_PRIORITY,
                           NULL );
 
+
+
     
     /*
     ( void ) xTaskCreate( mqtt_config_task,
