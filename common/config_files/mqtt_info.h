@@ -33,7 +33,7 @@
 /*
  * Include for device certificate and private key
  */
-#include "aws_clientcredential_keys.h"
+//#include "aws_clientcredential_keys.h"
 
 /*
  * MQTT Broker endpoint.
