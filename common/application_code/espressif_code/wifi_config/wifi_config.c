@@ -305,7 +305,11 @@ void wifi_config_task(void * pvParameters){
     
     ( void ) pvParameters;
     
+    printf("DEBUG 1\n");
+    
+    //wifi_config_init();
     xWifiStatus = WIFI_On();
+    printf("DEBUG 2\n");
 
     if( xWifiStatus != eWiFiSuccess ){
         configPRINTF( ( "WiFi module failed to initialize.\r\n" ) );

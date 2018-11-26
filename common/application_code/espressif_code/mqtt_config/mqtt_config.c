@@ -49,6 +49,9 @@ void mqtt_config_task(void * pvParameters){
         configPRINTF( ( "MQTT echo test echoing task created.\r\n" ) );
         xReturned = mqtt_config_subcribe();
     }
+    for(;;){
+        vTaskDelay(5000 / portTICK_PERIOD_MS);
+    }
 
 
     /* Disconnect the client. */

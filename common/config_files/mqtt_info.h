@@ -38,12 +38,12 @@
 /*
  * MQTT Broker endpoint.
  */
-static const char MQTT_BROKER_ENDPOINT[] = "Paste AWS IoT Broker endpoint here.";
+static const char MQTT_BROKER_ENDPOINT[] = "anudiie8w30q6.iot.us-east-1.amazonaws.com";
 
 
 /* Use of a "define" and not a "static const" here to be able to
 * use pre-compile concatenation on the string. */
-#define IOT_THING_NAME "Paste AWS IoT Thing name here."
+#define IOT_THING_NAME "cosa9"
 
 /*
  * Port number the MQTT broker is using.

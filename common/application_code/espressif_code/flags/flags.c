@@ -5,7 +5,6 @@
 flags_t CONTROL_FLAGS;
 
 void flags_init(){
-    printf("flags_init()\n");
     CONTROL_FLAGS.raw_flags = 0;
 }
 

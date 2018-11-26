@@ -47,8 +47,8 @@
 
 int app_main( void ){
     flags_init();
-    nvs_storage_init();
     spiffs_storage_init();
+    nvs_storage_init();
     xLoggingTaskInitialize( mainLOGGING_TASK_STACK_SIZE,
 							tskIDLE_PRIORITY + 5,
 							mainLOGGING_MESSAGE_QUEUE_LENGTH );
@@ -57,9 +57,9 @@ int app_main( void ){
     /*
 
     */
+    wifi_config_init();
     authentication_init();
     mqtt_config_init();
-    wifi_config_init();
     
 
     ( void ) xTaskCreate( wifi_config_task,
@@ -69,10 +69,8 @@ int app_main( void ){
                           TASK_WIFI_PRIORITY,
                           NULL );
 
-
-
     
-    /*
+    
     ( void ) xTaskCreate( mqtt_config_task,
                           TASK_MQTT_SUBS_NAME,
                           TASK_MQTT_SUBS_STACK_SIZE,
@@ -80,6 +78,6 @@ int app_main( void ){
                           TASK_MQTT_SUBS_PRIORITY,
                           NULL );                          
     
-    */
+    
     return 0;
 }
