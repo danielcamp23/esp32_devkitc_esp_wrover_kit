@@ -46,31 +46,41 @@
 #define mainDEVICE_NICK_NAME                "AcuaMatic"
 
 int app_main( void ){
-    flags_init();
-    spiffs_storage_init();
-    nvs_storage_init();
     xLoggingTaskInitialize( mainLOGGING_TASK_STACK_SIZE,
 							tskIDLE_PRIORITY + 5,
 							mainLOGGING_MESSAGE_QUEUE_LENGTH );
     
-    	/* Create tasks that are not dependent on the WiFi being initialized. */
-    /*
-
-    */
-    wifi_config_init();
+    if(SYSTEM_Init() == pdPASS){
+        printf("SYSTEM_Init OK\n");
+    }
+    else{
+        printf("SYSTEM_Init Fail\n");
+    }
+    
+    flags_init();    
+    nvs_storage_init();    
     authentication_init();
-    mqtt_config_init();
+    wifi_config_init();
+    WIFIReturnCode_t xWifiStatus = wifi_config_start_driver();
+
+    if(xWifiStatus == eWiFiSuccess){
+        ( void ) xTaskCreate( wifi_config_task,
+                              TASK_WIFI_NAME,
+                              TASK_WIFI_STACK_SIZE,
+                              NULL,
+                              TASK_WIFI_PRIORITY,
+                              NULL );
+    }
+    else{
+
+    }
     
 
-    ( void ) xTaskCreate( wifi_config_task,
-                          TASK_WIFI_NAME,
-                          TASK_WIFI_STACK_SIZE,
-                          NULL,
-                          TASK_WIFI_PRIORITY,
-                          NULL );
 
+
+    //spiffs_storage_init();
     
-    
+    /*
     ( void ) xTaskCreate( mqtt_config_task,
                           TASK_MQTT_SUBS_NAME,
                           TASK_MQTT_SUBS_STACK_SIZE,
@@ -78,6 +88,6 @@ int app_main( void ){
                           TASK_MQTT_SUBS_PRIORITY,
                           NULL );                          
     
-    
+    */
     return 0;
 }

@@ -8,16 +8,12 @@
 #include "task.h"
 
 
-#include "aws_dev_mode_key_provisioning.h"
 
 /* AWS System includes. */
 #include "aws_system_init.h"
 #include "aws_logging_task.h"
 #include "aws_wifi.h"
 //#include "aws_clientcredential.h"
-#include "wifi_info.h"
-#include "mqtt_info.h"//PROVISIONAL, DEBERIA IR EN LA TAREA DE MQTT CUANDO SE CREE
-#include "nvs_flash.h"
 #include "FreeRTOS_IP.h"
 #include "FreeRTOS_Sockets.h"
 
@@ -28,10 +24,6 @@
 /* Application version info. */
 #include "aws_application_version.h"
 
-/* Logging Task Defines. */
-#define mainLOGGING_MESSAGE_QUEUE_LENGTH    ( 32 )
-#define mainLOGGING_TASK_STACK_SIZE         ( configMINIMAL_STACK_SIZE * 6 )
-#define mainDEVICE_NICK_NAME                "Espressif_Demo"
 
 /* Declare the firmware version structure for all to see. */
 const AppVersion32_t xAppFirmwareVersion = {
@@ -169,7 +161,7 @@ const char * pcApplicationHostnameHook( void )
 {
     /* This function will be called during the DHCP: the machine will be registered 
      * with an IP address plus this name. */
-    return IOT_THING_NAME;
+    return "Acuamatic";
 }
 
 #endif
@@ -285,13 +277,10 @@ void wifi_config_init(){
             ucGatewayAddress,
             ucDNSServerAddress,
             ucMACAddress );
+}
 
-    if(SYSTEM_Init() == pdPASS){
-        printf("SYSTEM_Init OK\n");
-    }
-    else{
-        printf("SYSTEM_Init Fail\n");
-    }
+WIFIReturnCode_t wifi_config_start_driver(){
+    return WIFI_On();
 }
 
 
@@ -304,17 +293,6 @@ void wifi_config_task(void * pvParameters){
     bool connecting = false;
     
     ( void ) pvParameters;
-    
-    printf("DEBUG 1\n");
-    
-    //wifi_config_init();
-    xWifiStatus = WIFI_On();
-    printf("DEBUG 2\n");
-
-    if( xWifiStatus != eWiFiSuccess ){
-        configPRINTF( ( "WiFi module failed to initialize.\r\n" ) );
-        vTaskDelete(NULL);//SI no se inicializó el módulo, se detiene la tarea
-    }
 
     xNetworkParams.pcSSID = WIFI_SSID;
     xNetworkParams.ucSSIDLength = sizeof( WIFI_SSID );
