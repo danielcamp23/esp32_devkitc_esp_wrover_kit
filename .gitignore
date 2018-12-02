@@ -1,5 +1,3 @@
 /build
-sdkconfig
-sdkconfig.*
 .vscode/
 clientcredential_keys.h
