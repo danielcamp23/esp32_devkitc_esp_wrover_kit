@@ -7,8 +7,6 @@
 #include "FreeRTOS.h"
 #include "task.h"
 
-
-
 /* AWS System includes. */
 #include "aws_system_init.h"
 #include "aws_logging_task.h"

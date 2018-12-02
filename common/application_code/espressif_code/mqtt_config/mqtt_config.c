@@ -16,10 +16,10 @@
 
 static MQTTAgentHandle_t xMQTTHandle = NULL;
 static MessageBufferHandle_t xEchoMessageBuffer = NULL;
-
+QueueHandle_t gpio_mqtt_queue;
 
 void mqtt_config_init(void * param){
-
+    gpio_mqtt_queue = xQueueCreate(5, sizeof(struct MqttMsg));
 }
 
 void mqtt_config_task(void * pvParameters){
@@ -50,7 +50,13 @@ void mqtt_config_task(void * pvParameters){
         xReturned = mqtt_config_subcribe();
     }
     for(;;){
-        vTaskDelay(5000 / portTICK_PERIOD_MS);
+        struct MqttMsg mqtt_msg;
+        if(xQueueReceive(gpio_mqtt_queue, &mqtt_msg, 0 )){
+            printf("Recibo interrupt mqtt\n");
+            mqtt_config_report_status(mqtt_msg);
+            printf("* %d - %d\n", mqtt_msg.gpio, mqtt_msg.status);
+        }
+        vTaskDelay(1000 / portTICK_PERIOD_MS);
     }
 
 
@@ -63,6 +69,22 @@ void mqtt_config_task(void * pvParameters){
     vMessageBufferDelete( xEchoMessageBuffer );
     vTaskDelete( xEchoingTask );
     vTaskDelete( NULL ); /* Delete this task. */
+}
+
+void mqtt_config_report_status(struct MqttMsg mqtt_msg){
+    MQTTAgentReturnCode_t xReturned;
+    MQTTAgentPublishParams_t xPublishParameters;
+    char cDataBuffer[ MQTT_MAX_DATA_LENGTH ];
+
+    ( void ) snprintf( cDataBuffer, MQTT_MAX_DATA_LENGTH, "Cambio sensor %d : %s ", mqtt_msg.gpio, (mqtt_msg.status ? "ON" : "OFF") );
+    memset( &( xPublishParameters ), 0x00, sizeof( xPublishParameters ) );
+    xPublishParameters.pucTopic = MQTT_PUBLISH_TOPIC;
+    xPublishParameters.pvData = cDataBuffer;
+    xPublishParameters.usTopicLength = ( uint16_t ) strlen( ( const char * ) MQTT_PUBLISH_TOPIC );
+    xPublishParameters.ulDataLength = ( uint32_t ) strlen( cDataBuffer );
+    xPublishParameters.xQoS = eMQTTQoS1;
+    xReturned = MQTT_AGENT_Publish( xMQTTHandle, &( xPublishParameters ), MQTT_TIMEOUT );
+
 }
 
 static BaseType_t mqtt_config_connect_to_broker( void )

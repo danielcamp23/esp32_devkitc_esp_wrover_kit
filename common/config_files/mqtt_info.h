@@ -38,12 +38,14 @@
 /*
  * MQTT Broker endpoint.
  */
-static const char MQTT_BROKER_ENDPOINT[] = "anudiie8w30q6.iot.us-east-1.amazonaws.com";
+//a3b86accc5t4qb.iot.us-east-1.amazonaws.com
+//static const char MQTT_BROKER_ENDPOINT[] = "anudiie8w30q6.iot.us-east-1.amazonaws.com";
+static const char MQTT_BROKER_ENDPOINT[] = "a3b86accc5t4qb.iot.us-east-1.amazonaws.com";
 
 
 /* Use of a "define" and not a "static const" here to be able to
 * use pre-compile concatenation on the string. */
-#define IOT_THING_NAME "cosa9"
+#define IOT_THING_NAME "cosa90"
 
 /*
  * Port number the MQTT broker is using.
@@ -79,7 +81,7 @@ to perform a TLS negotiation. */
  * @brief Dimension of the character array buffers used to hold data (strings in
  * this case) that is published to and received from the MQTT broker (in the cloud).
  */
-#define MQTT_MAX_DATA_LENGTH      20
+#define MQTT_MAX_DATA_LENGTH      40
 
 
 #endif

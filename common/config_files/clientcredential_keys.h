@@ -11,6 +11,9 @@
  * "...base64 data...\n"\
  * "-----END CERTIFICATE-----"
  */
+
+/*
+//MIO
 #define keyCLIENT_CERTIFICATE_PEM \
 "-----BEGIN CERTIFICATE-----\n"\
 "MIIDWjCCAkKgAwIBAgIVAONI2X+MQ6PD1gXDWjJkOCeveIilMA0GCSqGSIb3DQEB\n"\
@@ -32,6 +35,35 @@
 "FD6rsBOm7Qjq4n/UtfQtjEz/U400/TKfd+xqpAYqM8zU6t+gTzk+OuFincNFNVvS\n"\
 "Ay/WMxuASvaK3fHz6kz6QWR5Oiwg2N7m5ZT2nnWBH+K77Ez0hl6MZgYdtvF0TQ==\n"\
 "-----END CERTIFICATE-----"
+*/
+
+#define keyCLIENT_CERTIFICATE_PEM \
+"-----BEGIN CERTIFICATE-----\n"\
+"MIID6DCCAtACFFoNG6p8JMNMjI/Y+MryEfCQEzFNMA0GCSqGSIb3DQEBCwUAMIGU\n"\
+"MQswCQYDVQQGEwJDTzESMBAGA1UECAwJQW50aW9xdWlhMREwDwYDVQQHDAhNZWRl\n"\
+"bGxpbjESMBAGA1UECgwJQWN1YW1hdGljMRIwEAYDVQQLDAlBY3VhbWF0aWMxEjAQ\n"\
+"BgNVBAMMCUFjdWFtYXRpYzEiMCAGCSqGSIb3DQEJARYTYWN1YW1hdGljQGdtYWls\n"\
+"LmNvbTAeFw0xODEyMDIwMjI3MjVaFw0xOTEyMDIwMjI3MjVaMIHLMQswCQYDVQQG\n"\
+"EwJDTzESMBAGA1UECAwJQW50aW9xdWlhMREwDwYDVQQHDAhNZWRlbGxpbjESMBAG\n"\
+"A1UECgwJQWN1YW1hdGljMRIwEAYDVQQLDAlBY3VhbWF0aWMxSTBHBgNVBAMMQDA2\n"\
+"ODlhMjY1ZTkzOTE0YTYyZWFhYzM0YmE1MzUzNTI1ZjEyNzM2YWNjNzUzOThjYjU4\n"\
+"NjIwMDlmNTVmMmJlZjgxIjAgBgkqhkiG9w0BCQEWE2FjdWFtYXRpY0BnbWFpbC5j\n"\
+"b20wggEiMA0GCSqGSIb3DQEBAQUAA4IBDwAwggEKAoIBAQCs4Oy2KgXfuaA5L0BS\n"\
+"gT3GmBPyY1HW8dTH3Ocd77Wem60W8OkB38ud4sLZpkTbTxlcAeUPN2OMgdNabc7a\n"\
+"hG8wA7Vju7Elh914xKQ6sYj5pm2/22POvy65vsuUc+QaSixSzxUKiZyL+lXyE00Y\n"\
+"bvTmYxSiQb2IFap3BqcMOYAx5pPe5F5NgJWg4N4Gd26XbZUlFVZe/JJYGvRKAGS0\n"\
+"9m6jdx105iZBI7T5KwVqwcpwOH5Nbz6W8mVR6AwHuKg1RSHmJD6l4iRIwExJDLwp\n"\
+"F7ocYJL7FJ9pYWH9OFiYVPUP63uK42MpKh3irRhg/dt5/EnpUercoRftk31bJKBM\n"\
+"+qfvAgMBAAEwDQYJKoZIhvcNAQELBQADggEBACFv3qXZPOQX4pL4PvRlYwYo8rhk\n"\
+"Fog8kGKyIzUa/dBTZbd8s+K1ECW0gh/xG7hLC5vOd2vTCZ1949094p7wGpu7TEAH\n"\
+"7Fwfz5vHD+8KJ912h61f9Uesw11vAB8EGSEEl6qgExxToVJedG2GDaMzgWdCssEy\n"\
+"sgVeWWG3WJCawdQ+08ZjGslWDKT0SN027I/wl40UeM0fVyN9Q7iy2j0CEMeNyB+7\n"\
+"CKloYqdFNpDzlW+yJ9oNwcOxP7ZmJVBpjmrqFtWW6U4I6XPgNgmGwAuBYiAQdj0e\n"\
+"MppZI0KUBHRac0ZxK3s3kV4FPpqm+men8HqY4wbVK777CH1wtPkOUXuGMis=\n"\
+"-----END CERTIFICATE-----"
+
+
+
 
 /*
  * PEM-encoded client private key.
@@ -41,6 +73,10 @@
  * "...base64 data...\n"\
  * "-----END RSA PRIVATE KEY-----"
  */
+
+
+/*
+//MIO
 #define keyCLIENT_PRIVATE_KEY_PEM \
 "-----BEGIN RSA PRIVATE KEY-----\n"\
 "MIIEpAIBAAKCAQEAyQhl7OpCO0ZBVeAWHdlxYx0BSd3XGsQvqzwv+8BhDhbsr2NE\n"\
@@ -69,6 +105,36 @@
 "mUHEQHLv6dUHmtl/QW0qWBU/qj1z7cAS4PrUE7Luflf9Tgub8cpVMOBaEvB/InKs\n"\
 "rc7QmkPCzh8GUmEie4z07mHcURbDci6vpod33in6vRMqcfrIY/t/ww==\n"\
 "-----END RSA PRIVATE KEY-----"
+*/
+
+#define keyCLIENT_PRIVATE_KEY_PEM \
+"-----BEGIN RSA PRIVATE KEY-----\n"\
+"MIIEowIBAAKCAQEArODstioF37mgOS9AUoE9xpgT8mNR1vHUx9znHe+1nputFvDp\n"\
+"Ad/LneLC2aZE208ZXAHlDzdjjIHTWm3O2oRvMAO1Y7uxJYfdeMSkOrGI+aZtv9tj\n"\
+"zr8uub7LlHPkGkosUs8VComci/pV8hNNGG705mMUokG9iBWqdwanDDmAMeaT3uRe\n"\
+"TYCVoODeBndul22VJRVWXvySWBr0SgBktPZuo3cddOYmQSO0+SsFasHKcDh+TW8+\n"\
+"lvJlUegMB7ioNUUh5iQ+peIkSMBMSQy8KRe6HGCS+xSfaWFh/ThYmFT1D+t7iuNj\n"\
+"KSod4q0YYP3befxJ6VHq3KEX7ZN9WySgTPqn7wIDAQABAoIBAHtnu9F1QegoG4V2\n"\
+"g1Xhx/VBjcuStlLXIerhd2FZQa5MtkwQAGREGpdDzY+MLs7WMeYJvDcWdMtRyUtd\n"\
+"4zD9JFmD7DGbQ6Lkz2VsCUeUf5CmCuXPd/mXY4VX+v6nk4ZouCcMh5qUDNmnAz7g\n"\
+"JEJywgLLa2k/wEmqHZsFdq01RptXLW2bRy8Axlhi1J91mjz52Up0xSisU/1K3GiC\n"\
+"cv7nGrAggxalqgLp9yJpOjYCagmbnmmas4o6U+JK8I0jxZ84kt22iIUgneqG7nHW\n"\
+"9F5TnzBplhMpgK6osFllfWdH+Omnuk50yYCXdJ+YVEzpc+QgASGkterDtHrtNPjT\n"\
+"ACSdSRECgYEA5ZFMNyEJj98Rs4Gf19yoMj6vSsJBhFYRV5jghidUX23klJXnak5P\n"\
+"pemDx5Itsu5mQ+NosfjeA6v/09mLSNZG9UaVJpFrz6Ccasj1szCqsNRBEj7RqVeQ\n"\
+"JcdSoIVebrZgeG/3EIdNhpgat29wJYdBkG6QIHEF0ub/L9r31iFMnysCgYEAwMir\n"\
+"xZ/43sRPH0yhbTx7vXlZNa97MM1eWFkBr/0L2ZufRzhoEfqqJwyWPdbYiagpR5hv\n"\
+"QkRpvG2mAyS6/+XWZuaJW6Fon2PEFx+j9Ch7lYA92VZF8F3fjk3KMIYRhgYDEnsj\n"\
+"4G5aKP/ANBCX2g5U6bw3WME/lO1arl6FaXqoWE0CgYAl0EAYmJWFoD2/LqvQl6UQ\n"\
+"2ahwDP1TugWTQzhAgLvyGBzdqK98oDeYYZV2SwrB/WjU5+F350FSo4M5Nw0tSzZW\n"\
+"8nBg8PUsNw1svXtTL8H97IhnY/ePCEBTKLjgffdnDx1m2TJ+A3tunyFPc8iqNdRD\n"\
+"4SJWZaeK7Me97ziBieygDwKBgAfc52yjDrJ/TT7YkEj1S5K5zVKsOpkN90ghMTlt\n"\
+"V7tjZoawHUaGc8Qt9j7FcYWDz1M1O2x3f9yImFnOeLYROMJvqrCLD8pYdln/F1/Q\n"\
+"+uFpHpyrsSSRn5mdQJ7kCPjva9aoIRl5RsIfVEaLWrYxGXODErrS/vXjDGzKPCTG\n"\
+"NPGNAoGBANIjq2LOboXbFR/pGNR2Y2YRFwJMh+f3YsH/xtykNw/BhpCbuabcaqQJ\n"\
+"LsQrLsQNZbshn1HYK37ST3fgmCKnqFXt7G3ObxUv+bpIuVoIYb2UGoneVz6tOSJ+\n"\
+"Fs0wr57lFz59QPVpJY/ibi1oX5cazhMwCDSj66ajExdFSajPe3bh\n"\
+"-----END RSA PRIVATE KEY-----"
 
 /*
  * PEM-encoded Just-in-Time Registration (JITR) certificate (optional).
@@ -78,7 +144,9 @@
  * "...base64 data...\n"\
  * "-----END CERTIFICATE-----"
  */
+
 #define keyJITR_DEVICE_CERTIFICATE_AUTHORITY_PEM  NULL
+
 
 /* The constants above are set to const char * pointers defined in aws_dev_mode_key_provisioning.c,
  * and externed here for use in C files.  NOTE!  THIS IS DONE FOR CONVENIENCE
