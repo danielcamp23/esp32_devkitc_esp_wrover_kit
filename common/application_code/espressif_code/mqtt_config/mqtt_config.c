@@ -52,9 +52,7 @@ void mqtt_config_task(void * pvParameters){
     for(;;){
         struct MqttMsg mqtt_msg;
         if(xQueueReceive(gpio_mqtt_queue, &mqtt_msg, 0 )){
-            printf("Recibo interrupt mqtt\n");
             mqtt_config_report_status(mqtt_msg);
-            printf("* %d - %d\n", mqtt_msg.gpio, mqtt_msg.status);
         }
         vTaskDelay(1000 / portTICK_PERIOD_MS);
     }
@@ -76,7 +74,7 @@ void mqtt_config_report_status(struct MqttMsg mqtt_msg){
     MQTTAgentPublishParams_t xPublishParameters;
     char cDataBuffer[ MQTT_MAX_DATA_LENGTH ];
 
-    ( void ) snprintf( cDataBuffer, MQTT_MAX_DATA_LENGTH, "Cambio sensor %d : %s ", mqtt_msg.gpio, (mqtt_msg.status ? "ON" : "OFF") );
+    ( void ) snprintf( cDataBuffer, MQTT_MAX_DATA_LENGTH, "{\"data\": %s, \"date\":1543717507, \"connection\":true}", (mqtt_msg.status ? "1.0" : "0.0") );
     memset( &( xPublishParameters ), 0x00, sizeof( xPublishParameters ) );
     xPublishParameters.pucTopic = MQTT_PUBLISH_TOPIC;
     xPublishParameters.pvData = cDataBuffer;
@@ -148,7 +146,7 @@ static BaseType_t mqtt_config_subcribe(void){
     MQTTAgentReturnCode_t xReturned;
     BaseType_t xReturn;
     MQTTAgentSubscribeParams_t xSubscribeParams;
-
+    printf("TOPIC: %s\n", MQTT_SUBSCRIBE_TOPIC);
     /* Setup subscribe parameters to subscribe to MQTT_SUBSCRIBE_TOPIC topic. */
     xSubscribeParams.pucTopic = MQTT_SUBSCRIBE_TOPIC;
     xSubscribeParams.pvPublishCallbackContext = NULL;
@@ -185,8 +183,11 @@ static MQTTBool_t mqtt_config_subs_callback(void * pvUserData, const MQTTPublish
     ( void ) pvUserData;
 
     /* Don't expect the callback to be invoked for any other topics. */
-    configASSERT( ( size_t ) ( pxCallbackParams->usTopicLength ) == strlen( ( const char * ) MQTT_SUBSCRIBE_TOPIC ) );
-    configASSERT( memcmp( pxCallbackParams->pucTopic, MQTT_SUBSCRIBE_TOPIC, ( size_t ) ( pxCallbackParams->usTopicLength ) ) == 0 );
+    //configASSERT( ( size_t ) ( pxCallbackParams->usTopicLength ) == strlen( ( const char * ) MQTT_SUBSCRIBE_TOPIC ) );
+    //configASSERT( memcmp( pxCallbackParams->pucTopic, MQTT_SUBSCRIBE_TOPIC, ( size_t ) ( pxCallbackParams->usTopicLength ) ) == 0 );
+
+    printf("TOPIC recibo: %s\n", pxCallbackParams->pucTopic);
+    memcmp(pxCallbackParams->pucTopic, MQTT_SUBSCRIBE_TOPIC, ( size_t ) ( pxCallbackParams->usTopicLength )) ;
 
     /* THe ulBytesToCopy has already been initialized to ensure it does not copy
      * more bytes than will fit in the buffer.  Now check it does not copy more
