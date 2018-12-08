@@ -16,10 +16,10 @@
 
 static MQTTAgentHandle_t xMQTTHandle = NULL;
 static MessageBufferHandle_t xEchoMessageBuffer = NULL;
-QueueHandle_t gpio_mqtt_queue;
+QueueHandle_t mqtt_queue;
 
 void mqtt_config_init(void * param){
-    gpio_mqtt_queue = xQueueCreate(5, sizeof(struct MqttMsg));
+    mqtt_queue = xQueueCreate(5, sizeof(struct MqttMsg));
 }
 
 void mqtt_config_task(void * pvParameters){
@@ -51,7 +51,7 @@ void mqtt_config_task(void * pvParameters){
     }
     for(;;){
         struct MqttMsg mqtt_msg;
-        if(xQueueReceive(gpio_mqtt_queue, &mqtt_msg, 0 )){
+        if(xQueueReceive(mqtt_queue, &mqtt_msg, 0 )){
             mqtt_config_report_status(mqtt_msg);
         }
         vTaskDelay(1000 / portTICK_PERIOD_MS);
@@ -187,7 +187,7 @@ static MQTTBool_t mqtt_config_subs_callback(void * pvUserData, const MQTTPublish
     //configASSERT( memcmp( pxCallbackParams->pucTopic, MQTT_SUBSCRIBE_TOPIC, ( size_t ) ( pxCallbackParams->usTopicLength ) ) == 0 );
 
     printf("TOPIC recibo: %s\n", pxCallbackParams->pucTopic);
-    memcmp(pxCallbackParams->pucTopic, MQTT_SUBSCRIBE_TOPIC, ( size_t ) ( pxCallbackParams->usTopicLength )) ;
+    //memcmp(pxCallbackParams->pucTopic, MQTT_SUBSCRIBE_TOPIC, ( size_t ) ( pxCallbackParams->usTopicLength )) ;
 
     /* THe ulBytesToCopy has already been initialized to ensure it does not copy
      * more bytes than will fit in the buffer.  Now check it does not copy more

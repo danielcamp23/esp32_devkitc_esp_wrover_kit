@@ -40,6 +40,7 @@
 #include "wifi_config.h"
 #include "mqtt_config.h"
 #include "gpio_handler.h"
+#include "rtc_config.h"
 
 /* Logging Task Defines. */
 #define mainLOGGING_MESSAGE_QUEUE_LENGTH    ( 32 )
@@ -62,10 +63,10 @@ int app_main( void ){
     nvs_storage_init();    
     authentication_init();
     mqtt_config_init();
-    printf("HOLA0\n");
     gpio_handler_init();
-    printf("HOLA1\n");
+    rtc_config_init();
     wifi_config_init();
+
     WIFIReturnCode_t xWifiStatus = wifi_config_start_driver();
 
     if(xWifiStatus == eWiFiSuccess){

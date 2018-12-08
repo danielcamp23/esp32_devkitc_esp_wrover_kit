@@ -3,6 +3,7 @@
 #include "gpio_info.h"
 #include "mqtt_config.h"
 #include "task_config.h"
+#include "rtc_config.h"
 
 #include <stdint.h>
 #include <stdlib.h>
@@ -48,18 +49,28 @@ void gpio_handler_task(void * pvParameters){
     uint32_t gpio;
     printf("gpio task created\n");
     struct MqttMsg mqtt_msg;
+    uint32_t interrupt_time = 0;
+    bool report_change = false;
+    int prev_status = 0;
+    int curr_status = 0;
     for(;;){
-        if(xQueueReceiveFromISR(gpio_evt_queue, &gpio, NULL)){
-            int prev = gpio_handler_read(gpio);
-            vTaskDelay(100 / portTICK_PERIOD_MS);
-            if(prev == gpio_handler_read(gpio)){
+        while(xQueueReceiveFromISR(gpio_evt_queue, &gpio, NULL) != errQUEUE_EMPTY){
+            prev_status = gpio_handler_read(gpio);
+            interrupt_time = rtc_config_get_time();
+            report_change = true;
+        }
+
+        if( report_change && (rtc_config_get_time() - interrupt_time > 500)){
+            report_change = false;
+            curr_status = gpio_handler_read(gpio);
+            if(prev_status == curr_status){
                 mqtt_msg.gpio = gpio;
-                mqtt_msg.status = gpio_handler_read(gpio);
-                printf("ENVIO A MQTT\n");
-                xQueueSendToBack(gpio_mqtt_queue, &mqtt_msg, 0);
-                //printf("Interrupt-> %d: %s\n", gpio, (prev ? "HIGH" : "LOW"));
+                mqtt_msg.status = curr_status;
+                //xQueueSendToBack(mqtt_queue, &mqtt_msg, 0);
+                printf("Estado: %d\n", curr_status);
             }
         }
+
         vTaskDelay(500 / portTICK_PERIOD_MS);
     }
 }

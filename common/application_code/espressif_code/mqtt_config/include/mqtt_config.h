@@ -9,7 +9,7 @@ struct MqttMsg {
     int status;
 };
 
-extern QueueHandle_t gpio_mqtt_queue;
+extern QueueHandle_t mqtt_queue;
 
 void mqtt_config_init();
 
