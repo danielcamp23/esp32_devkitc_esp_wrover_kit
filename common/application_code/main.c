@@ -53,38 +53,38 @@ int app_main( void ){
 							mainLOGGING_MESSAGE_QUEUE_LENGTH );
     
     if(SYSTEM_Init() == pdPASS){
-        printf("SYSTEM_Init OK\n");
+        //printf("SYSTEM_Init OK\n");
+        flags_init();
+        nvs_storage_init();    
+        authentication_init();
+        mqtt_config_init();
+        gpio_handler_init();
+        rtc_config_init();
+        wifi_config_init();
+
+        WIFIReturnCode_t xWifiStatus = wifi_config_start_driver();
+
+        if(xWifiStatus == eWiFiSuccess){
+            ( void ) xTaskCreate( wifi_config_task,
+                                TASK_WIFI_NAME,
+                                TASK_WIFI_STACK_SIZE,
+                                NULL,
+                                TASK_WIFI_PRIORITY,
+                                NULL );
+        
+            ( void ) xTaskCreate( mqtt_config_task,
+                                TASK_MQTT_SUBS_NAME,
+                                TASK_MQTT_SUBS_STACK_SIZE,
+                                NULL,
+                                TASK_MQTT_SUBS_PRIORITY,
+                                NULL );                          
+            
+        }   
     }
     else{
         printf("SYSTEM_Init Fail\n");
     }
     
-    flags_init();    
-    nvs_storage_init();    
-    authentication_init();
-    mqtt_config_init();
-    gpio_handler_init();
-    rtc_config_init();
-    wifi_config_init();
-
-    WIFIReturnCode_t xWifiStatus = wifi_config_start_driver();
-
-    if(xWifiStatus == eWiFiSuccess){
-        ( void ) xTaskCreate( wifi_config_task,
-                              TASK_WIFI_NAME,
-                              TASK_WIFI_STACK_SIZE,
-                              NULL,
-                              TASK_WIFI_PRIORITY,
-                              NULL );
-       
-        ( void ) xTaskCreate( mqtt_config_task,
-                            TASK_MQTT_SUBS_NAME,
-                            TASK_MQTT_SUBS_STACK_SIZE,
-                            NULL,
-                            TASK_MQTT_SUBS_PRIORITY,
-                            NULL );                          
-        
-    }    
     
     return 0;
 }

@@ -15,8 +15,8 @@ void rtc_config_init(){
     rtc_offset = 0;
     rtc_time = 0;
     rtc_mutex = xSemaphoreCreateMutex();
-    printf("TIME: configTICK_RATE_HZ %d\n", configTICK_RATE_HZ);
-    printf("TIME: RTC_CONFIG_FACTOR %d\n", RTC_CONFIG_FACTOR);
+    //printf("TIME: configTICK_RATE_HZ %d\n", configTICK_RATE_HZ);
+    //printf("TIME: RTC_CONFIG_FACTOR %d\n", RTC_CONFIG_FACTOR);
     if(rtc_mutex != NULL){
         xSemaphoreGive(rtc_mutex);
     }
@@ -40,6 +40,7 @@ void rtc_config_set_time(uint32_t in_time){
         rtc_time = in_time;
     }
     else{
+        xSemaphoreGive(rtc_mutex);
         return;
     }
 }

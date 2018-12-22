@@ -30,7 +30,7 @@ void mqtt_config_task(void * pvParameters){
     TaskHandle_t xEchoingTask = NULL;
 
     ( void ) pvParameters;
-    printf("MQTT created\n");
+
     for(;;){
         if(flags_is_wifi_connected()){
             break;
@@ -39,13 +39,13 @@ void mqtt_config_task(void * pvParameters){
         vTaskDelay(5000 / portTICK_PERIOD_MS);
     }
 
-    printf("MQTT after WIFI\n");
 
     /* Create the MQTT client object and connect it to the MQTT broker. */
     xReturned = mqtt_config_connect_to_broker();
 
 
     if( xReturned == pdPASS ){
+        flags_set_mqtt_connected();
         configPRINTF( ( "MQTT echo test echoing task created.\r\n" ) );
         xReturned = mqtt_config_subcribe();
     }

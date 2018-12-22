@@ -66,7 +66,7 @@ void gpio_handler_task(void * pvParameters){
             if(prev_status == curr_status){
                 mqtt_msg.gpio = gpio;
                 mqtt_msg.status = curr_status;
-                //xQueueSendToBack(mqtt_queue, &mqtt_msg, 0);
+                xQueueSendToBack(mqtt_queue, &mqtt_msg, 0);
                 printf("Estado: %d\n", curr_status);
             }
         }
