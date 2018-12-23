@@ -1,5 +1,8 @@
 #include "ota_client.h"
+#include "ota_client_static.h"
 #include "aws_ota_agent.h"
+#include "mqtt_config.h"
+#include "mqtt_info.h"
 
 
 /*
@@ -13,19 +16,18 @@ void ota_client_init(){
 
 void ota_client_check_firmware(){
     
-    if(ota_client_launched){//Solo se lanza la tarea una vez
+    if(ota_client_launched){//Previene que se lance la tarea más de una vez.
         return;
     }
 
-    OTA_AgentInit(xMQTTClientHandle, ( const uint8_t * ) (clientcredentialIOT_THING_NAME), _ota_client_complete_callback, ( TickType_t ) ~0);
-
+    ota_client_launched = true;
+    OTA_AgentInit(mqtt_config_get_handler(), ( const uint8_t * ) (MQTT_CLIENT_ID), _ota_client_complete_callback, ( TickType_t ) ~0);
 }
 
 
 
 
-static void _ota_client_complete_callback( OTA_JobEvent_t eEvent )
-{
+static void _ota_client_complete_callback(OTA_JobEvent_t eEvent){
 	OTA_Err_t xErr = kOTA_Err_Uninitialized;
 	
     if (eEvent == eOTA_JobEvent_Activate){
@@ -48,4 +50,5 @@ static void _ota_client_complete_callback( OTA_JobEvent_t eEvent )
             OTA_LOG_L1( " Error! Failed to set image state as accepted.\r\n" );    
         }
 	}
+    ota_client_launched = false;
 }

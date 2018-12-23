@@ -41,6 +41,7 @@
 #include "mqtt_config.h"
 #include "gpio_handler.h"
 #include "rtc_config.h"
+#include "ota_client.h"
 
 /* Logging Task Defines. */
 #define mainLOGGING_MESSAGE_QUEUE_LENGTH    ( 32 )
@@ -61,6 +62,7 @@ int app_main( void ){
         gpio_handler_init();
         rtc_config_init();
         wifi_config_init();
+        ota_client_init();
 
         WIFIReturnCode_t xWifiStatus = wifi_config_start_driver();
 
@@ -72,6 +74,7 @@ int app_main( void ){
                                 TASK_WIFI_PRIORITY,
                                 NULL );
         
+            
             ( void ) xTaskCreate( mqtt_config_task,
                                 TASK_MQTT_SUBS_NAME,
                                 TASK_MQTT_SUBS_STACK_SIZE,

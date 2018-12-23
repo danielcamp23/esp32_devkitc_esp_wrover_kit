@@ -50,6 +50,7 @@ void flags_set_wifi_connected(){
     if(_flags_take_mutex()){
         CONTROL_FLAGS.wifi_connected = 1;
     }
+    _flags_give_mutex();
 }
 
 bool flags_is_mqtt_connected(){
@@ -65,6 +66,7 @@ void flags_set_mqtt_connected(){
     if(_flags_take_mutex()){
         CONTROL_FLAGS.mqtt_connected = 1;
     }
+    _flags_give_mutex();
 }
 
 

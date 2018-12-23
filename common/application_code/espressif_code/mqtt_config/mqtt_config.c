@@ -39,7 +39,6 @@ void mqtt_config_task(void * pvParameters){
         vTaskDelay(5000 / portTICK_PERIOD_MS);
     }
 
-
     /* Create the MQTT client object and connect it to the MQTT broker. */
     xReturned = mqtt_config_connect_to_broker();
 
@@ -225,4 +224,8 @@ static MQTTBool_t mqtt_config_subs_callback(void * pvUserData, const MQTTPublish
      * MQTT agent that the ownership of the buffer containing the message lies with
      * the agent and it is responsible for freeing the buffer. */
     return eMQTTFalse;
+}
+
+MQTTAgentHandle_t mqtt_config_get_handler(){
+    return xMQTTHandle;
 }

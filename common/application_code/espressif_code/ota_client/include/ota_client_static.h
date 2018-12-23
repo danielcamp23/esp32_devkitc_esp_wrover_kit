@@ -1,6 +1,6 @@
-#ifndef _OTA_CLIEN_STATIC_H_
+#ifndef _OTA_CLIENT_STATIC_H_
 #define _OTA_CLIEN_STATIC_H_
-#include "aws_ota_client.h"
+#include "aws_ota_agent.h"
 
 /* The OTA agent has completed the update job or determined that we're in
  * self test mode. If it was accepted, we want to activate the new image.
