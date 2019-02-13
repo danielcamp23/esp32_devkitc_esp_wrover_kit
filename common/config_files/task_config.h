@@ -17,6 +17,10 @@
 #define TASK_MQTT_PUBL_STACK_SIZE    2000
 #define TASK_MQTT_PUBL_PRIORITY      2
 
+#define TASK_ANALOG_NAME            "Analog Read"
+#define TASK_ANALOG_STACK_SIZE      2000
+#define TASK_ANALOG_PRIORITY        2
+
 
 
 

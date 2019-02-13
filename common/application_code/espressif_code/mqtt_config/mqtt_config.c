@@ -28,6 +28,7 @@ void mqtt_config_task(void * pvParameters){
     const TickType_t xFiveSeconds = pdMS_TO_TICKS( 5000UL );
     const BaseType_t xIterationsInAMinute = 60 / 5;
     TaskHandle_t xEchoingTask = NULL;
+    struct MqttMsg mqtt_msg;
 
     ( void ) pvParameters;
 
@@ -49,8 +50,7 @@ void mqtt_config_task(void * pvParameters){
         xReturned = mqtt_config_subcribe();
     }
     for(;;){
-        struct MqttMsg mqtt_msg;
-        if(xQueueReceive(mqtt_queue, &mqtt_msg, 0 )){
+        if(xQueueReceive(mqtt_queue, &mqtt_msg, 0 )){//Lee si hay items en la cola
             mqtt_config_report_status(mqtt_msg);
         }
         vTaskDelay(1000 / portTICK_PERIOD_MS);
