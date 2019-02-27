@@ -4,6 +4,8 @@
 #include "freertos/FreeRTOS.h"
 #include "freertos/queue.h"
 #include "aws_mqtt_agent.h"
+#include "queue_conf.h"
+
 
 
 /**
@@ -12,10 +14,7 @@
  * desde el mqtt_task donde son reportados al broker.
  * 
 */
-struct MqttMsg {
-    uint32_t gpio;
-    int status;
-};
+
 
 /**
  * Cola para reporte de estado de los gpios

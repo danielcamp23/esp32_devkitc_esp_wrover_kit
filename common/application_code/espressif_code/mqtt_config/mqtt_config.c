@@ -3,6 +3,7 @@
 #include "mqtt_info.h"
 #include "task_config.h"
 #include "flags.h"
+#include "queue_conf.h"
 
 #include "string.h"
 #include "stdio.h"
@@ -12,14 +13,25 @@
 #include "message_buffer.h"
 #include "aws_mqtt_agent.h"
 #include "aws_hello_world.h"
+#include "jsmn.h"
 
 
 static MQTTAgentHandle_t xMQTTHandle = NULL;
 static MessageBufferHandle_t xEchoMessageBuffer = NULL;
+static const int JSON_VALUE_LEN = 20;
 QueueHandle_t mqtt_queue;
 
+
+static int jsoneq(const char *json, jsmntok_t *tok, const char *s) {
+	if (tok->type == JSMN_STRING && (int) strlen(s) == tok->end - tok->start &&
+			strncmp(json + tok->start, s, tok->end - tok->start) == 0) {
+		return 0;
+	}
+	return -1;
+}
+
 void mqtt_config_init(void * param){
-    mqtt_queue = xQueueCreate(5, sizeof(struct MqttMsg));
+    //mqtt_queue = xQueueCreate(5, sizeof(struct MqttMsg));
 }
 
 void mqtt_config_task(void * pvParameters){
@@ -52,6 +64,7 @@ void mqtt_config_task(void * pvParameters){
     for(;;){
         if(xQueueReceive(mqtt_queue, &mqtt_msg, 0 )){//Lee si hay items en la cola
             mqtt_config_report_status(mqtt_msg);
+
         }
         vTaskDelay(1000 / portTICK_PERIOD_MS);
     }
@@ -177,43 +190,78 @@ static MQTTBool_t mqtt_config_subs_callback(void * pvUserData, const MQTTPublish
     uint32_t ulBytesToCopy = ( MQTT_MAX_DATA_LENGTH - 1 ); /* Bytes to copy initialized to ensure it
                                                                                    * fits in the buffer. One place is left
                                                                                    * for NULL terminator. */
+                                                                                  int i;
+	int r;
+    jsmn_parser p;
+	jsmntok_t t[20]; /* We expect no more than 128 tokens */
+    char value[JSON_VALUE_LEN];
 
     /* Remove warnings about the unused parameters. */
     ( void ) pvUserData;
+
 
     /* Don't expect the callback to be invoked for any other topics. */
     //configASSERT( ( size_t ) ( pxCallbackParams->usTopicLength ) == strlen( ( const char * ) MQTT_SUBSCRIBE_TOPIC ) );
     //configASSERT( memcmp( pxCallbackParams->pucTopic, MQTT_SUBSCRIBE_TOPIC, ( size_t ) ( pxCallbackParams->usTopicLength ) ) == 0 );
 
-    printf("TOPIC recibo: %s\n", pxCallbackParams->pucTopic);
+    //printf("TOPIC recibo: %s\n", pxCallbackParams->pucTopic);
     //memcmp(pxCallbackParams->pucTopic, MQTT_SUBSCRIBE_TOPIC, ( size_t ) ( pxCallbackParams->usTopicLength )) ;
 
-    /* THe ulBytesToCopy has already been initialized to ensure it does not copy
-     * more bytes than will fit in the buffer.  Now check it does not copy more
-     * bytes than are available. */
     if( pxCallbackParams->ulDataLength <= ulBytesToCopy ){
         ulBytesToCopy = pxCallbackParams->ulDataLength;
-
-        /* Set the buffer to zero and copy the data into the buffer to ensure
-         * there is a NULL terminator and the buffer can be accessed as a
-         * string. */
+        
         memset( cBuffer, 0x00, sizeof( cBuffer ) );
         memcpy( cBuffer, pxCallbackParams->pvData, ( size_t ) ulBytesToCopy );
 
-        /* Only echo the message back if it has not already been echoed.  If the
-         * data has already been echoed then it will already contain the echoACK_STRING
-         * string. */
-        printf("Data received: %s\n", cBuffer);
-        //if( strstr( cBuffer, echoACK_STRING ) == NULL ){
-        //    /* The string has not been echoed before, so send it to the publish
-        //     * task, which will then echo the data back.  Make sure to send the
-        //     * terminating null character as well so that the received buffer in
-        //     * EchoingTask can be printed as a C string.  THE DATA CANNOT BE ECHOED
-        //     * BACK WITHIN THE CALLBACK AS THE CALLBACK IS EXECUTING WITHINT THE
-        //     * CONTEXT OF THE MQTT TASK.  Calling an MQTT API function here could cause
-        //     * a deadlock. */
-        //    ( void ) xMessageBufferSend( xEchoMessageBuffer, cBuffer, ( size_t ) ulBytesToCopy + ( size_t ) 1, echoDONT_BLOCK );
-        //}
+        //printf("Data received: %s\n", cBuffer);
+
+        jsmn_init(&p);
+	    r = jsmn_parse(&p, cBuffer, strlen(cBuffer), t, sizeof(t)/sizeof(t[0]));
+	    if (r < 0) {
+		    printf("Failed to parse JSON: %d\n", r);
+		    return 1;
+	    }
+
+        /* Assume the top-level element is an object */
+        if (r < 1 || t[0].type != JSMN_OBJECT) {
+            printf("Object expected\n");
+            return 1;
+        } 
+
+        uint32_t gpio = 0;
+        uint32_t status = 0;
+
+        printf("R = %d\n", r);
+        for (int i = 1; i < r; i++) {
+            memset( value, 0x00, JSON_VALUE_LEN);
+            strncpy(value, cBuffer + t[i+1].start, t[i+1].end-t[i+1].start);
+            if (jsoneq(cBuffer, &t[i], "GPIO_DO01") == 0) {
+                printf("GPIO_DO01: %s\n", value);
+                gpio = 1;
+                i++;                
+            } else if (jsoneq(cBuffer, &t[i], "GPIO_DO02") == 0) {
+                printf("GPIO_DO02: %s\n", value);
+                gpio = 2;
+                i++;
+            } else if (jsoneq(cBuffer, &t[i], "GPIO_DO03") == 0) {
+                printf("GPIO_DO03: %s\n", value);
+                gpio = 3;
+                i++;
+            } else if (jsoneq(cBuffer, &t[i], "GPIO_DO04") == 0) {
+                printf("GPIO_DO04: %s\n", value);
+                gpio = 4;
+                i++;
+            } else {
+                printf("Unexpected key: %.*s\n", t[i].end-t[i].start,
+                        cBuffer + t[i].start);
+                i++;                        
+            }
+	    }
+
+        if(gpio > 0){            
+            queue_conf_send_gpio(gpio, value[0] == '0' ? 0 : 1);
+        }
+
     }
     else{
         configPRINTF( ( "[WARN]: Dropping received message as it does not fit in the buffer.\r\n" ) );

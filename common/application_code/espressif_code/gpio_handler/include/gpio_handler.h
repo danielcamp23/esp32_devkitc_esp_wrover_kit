@@ -8,7 +8,9 @@
 
 void gpio_handler_init();
 
-void gpio_handler_task(void * pvParameters);
+void gpio_handler_read_task(void * pvParameters);
+
+void gpio_handler_write_task(void * pvParameters);
 
 int gpio_handler_read(uint32_t gpio);
 

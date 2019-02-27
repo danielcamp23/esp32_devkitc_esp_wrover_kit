@@ -4,6 +4,7 @@
 #include "mqtt_config.h"
 #include "task_config.h"
 #include "rtc_config.h"
+#include "queue_conf.h"
 
 #include <stdint.h>
 #include <stdlib.h>
@@ -14,18 +15,26 @@
 //#include "queue.h"
 
 static QueueHandle_t gpio_evt_queue;
+QueueHandle_t gpio_queue;
 
 
 void gpio_handler_init(){
     gpio_handler_config_gpios();
     gpio_evt_queue = xQueueCreate(15, sizeof(uint32_t));
     if(gpio_evt_queue != NULL){
-        ( void ) xTaskCreate( gpio_handler_task,
-                              TASK_GPIO_NAME,
-                              TASK_GPIO_STACK_SIZE,
+        ( void ) xTaskCreate( gpio_handler_read_task,
+                              TASK_GPIO_READ_NAME,
+                              TASK_GPIO_READ_STACK_SIZE,
                               NULL,
-                              TASK_GPIO_PRIORITY,
+                              TASK_READ_GPIO_PRIORITY,
                               NULL );
+
+        ( void ) xTaskCreate( gpio_handler_write_task,
+                              TASK_GPIO_WRITE_NAME,
+                              TASK_GPIO_WRITE_STACK_SIZE,
+                              NULL,
+                              TASK_WRITE_GPIO_PRIORITY,
+                              NULL );                              
     }
 }
 
@@ -46,7 +55,7 @@ void gpio_handler_write(uint32_t gpio, uint32_t level){
 }
 
 
-void gpio_handler_task(void * pvParameters){
+void gpio_handler_read_task(void * pvParameters){
     (void) pvParameters;
     uint32_t gpio;
     printf("gpio task created\n");
@@ -71,12 +80,29 @@ void gpio_handler_task(void * pvParameters){
             if(prev_status == curr_status){
                 mqtt_msg.gpio = gpio;
                 mqtt_msg.status = curr_status;
-                xQueueSendToBack(mqtt_queue, &mqtt_msg, 0); //TODO comentado para pruebas
+                queue_conf_send_mqtt(gpio, curr_status);
+                //xQueueSendToBack(mqtt_queue, &mqtt_msg, 0);
                 printf("GPIO: %d -- %d\n", gpio, curr_status);
             }
         }
 
         vTaskDelay(200 / portTICK_PERIOD_MS);
+    }
+}
+
+
+void gpio_handler_write_task(void * pvParameters){
+    (void) pvParameters;
+    struct MqttMsg mqtt_msg;
+
+    for(;;){
+        while(xQueueReceive(gpio_queue, &mqtt_msg, NULL) != errQUEUE_EMPTY){
+            gpio_handler_write(mqtt_msg.gpio, mqtt_msg.status);
+            printf("write gpio-> %d:", mqtt_msg.gpio);    
+            printf("%d\n", mqtt_msg.status);
+        }
+
+        vTaskDelay(1000 / portTICK_PERIOD_MS);
     }
 }
 

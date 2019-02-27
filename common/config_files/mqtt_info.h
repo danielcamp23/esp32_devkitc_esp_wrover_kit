@@ -57,9 +57,9 @@ static const char MQTT_BROKER_ENDPOINT[] = "a3b86accc5t4qb.iot.us-east-1.amazona
  */
 #define GREENGRASS_DISCOVERY_PORT 8443
 
-#define MQTT_SUBSCRIBE_TOPIC    ( ( const uint8_t * ) "output/081d3c50-65ea-4b36-96ae-d76d3428d392/7081067c-19ae-49b4-b0f6-50568ab1b7ee/#" )
+#define MQTT_SUBSCRIBE_TOPIC    ( ( const uint8_t * ) "output/12345678" )
 
-#define MQTT_PUBLISH_TOPIC      ( ( const uint8_t * ) "input/081d3c50-65ea-4b36-96ae-d76d3428d392/7081067c-19ae-49b4-b0f6-50568ab1b7ee/84868251-387d-4b59-a3bc-95c919e0dadd/18aa4eb0-7aad-4b0d-ae36-fd7fad63be93" )
+#define MQTT_PUBLISH_TOPIC      ( ( const uint8_t * ) "input/12345678" )
 
 /* Timeout used when performing MQTT operations that do not need extra time
 to perform a TLS negotiation. */

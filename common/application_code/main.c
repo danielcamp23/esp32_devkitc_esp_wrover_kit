@@ -43,6 +43,8 @@
 #include "rtc_config.h"
 #include "ota_client.h"
 #include "analog_handler.h"
+#include "udp_request.h"
+#include "queue_conf.h"
 
 /* Logging Task Defines. */
 #define mainLOGGING_MESSAGE_QUEUE_LENGTH    ( 32 )
@@ -59,22 +61,18 @@ int app_main( void ){
         flags_init();
         nvs_storage_init();    
         authentication_init();
+        queue_conf_init();
         mqtt_config_init();
         gpio_handler_init();
         rtc_config_init();
         wifi_config_init();
         //ota_client_init();
         //analog_handler_init();
+        udp_req_init();
 
-        /*
-        for(;;){
-            static int ctr = 0;
-            printf("Esta es una prueba para el OTA %d - ;)\n", ++ctr);
-            vTaskDelay(5000 / portTICK_PERIOD_MS);   
-        }
-        */
 
         WIFIReturnCode_t xWifiStatus = wifi_config_start_driver();
+
 
         
         if(xWifiStatus == eWiFiSuccess){
@@ -94,6 +92,7 @@ int app_main( void ){
                                 NULL );                          
             
         } 
+        
          
     }
     else{
