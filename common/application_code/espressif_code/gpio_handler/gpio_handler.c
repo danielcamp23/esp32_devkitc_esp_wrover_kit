@@ -54,11 +54,11 @@ void gpio_handler_write(uint32_t gpio, uint32_t level){
     switch(gpio){
         case 1: gpio = GPIO_DO01;
                 break;
-        case 2: gpio = GPIO_DO01;
+        case 2: gpio = GPIO_DO02;
                 break;
-        case 3: gpio = GPIO_DO01;
+        case 3: gpio = GPIO_DO03;
                 break;
-        case 4: gpio = GPIO_DO01;
+        case 4: gpio = GPIO_DO04;
                 break;                
     }
     printf("write gpio-> %d:", gpio);    
