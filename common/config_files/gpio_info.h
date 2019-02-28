@@ -21,11 +21,17 @@
 //#define GPIO_DI14      14   /* GPIO21 */
 
 
-#define GPIO_DO01       8   /* GPIO08 */
-#define GPIO_DO02       7   /* GPIO07 */
-#define GPIO_DO03       6   /* GPIO06 */
-#define GPIO_DO04      11   /* GPIO11 */
+/*
+#define GPIO_DO01       8   // GPIO08 
+#define GPIO_DO02       7   // GPIO07 
+#define GPIO_DO03       6   // GPIO06 
+#define GPIO_DO04      11   // GPIO11 
+*/
 
+#define GPIO_DO01       15   // GPIO08 
+#define GPIO_DO02       2   // GPIO07 
+#define GPIO_DO03       4   // GPIO06 
+#define GPIO_DO04      16   // GPIO11 
 
 /*
 Poner en "1" o "0" las entradas digitales del ESP que se van a conectar.

@@ -51,6 +51,18 @@ int gpio_handler_read(uint32_t gpio){
 }
 
 void gpio_handler_write(uint32_t gpio, uint32_t level){
+    switch(gpio){
+        case 1: gpio = GPIO_DO01;
+                break;
+        case 2: gpio = GPIO_DO01;
+                break;
+        case 3: gpio = GPIO_DO01;
+                break;
+        case 4: gpio = GPIO_DO01;
+                break;                
+    }
+    printf("write gpio-> %d:", gpio);    
+    printf("%d\n", level);
     gpio_set_level(gpio, level);
 }
 
@@ -93,13 +105,11 @@ void gpio_handler_read_task(void * pvParameters){
 
 void gpio_handler_write_task(void * pvParameters){
     (void) pvParameters;
-    struct MqttMsg mqtt_msg;
+    struct GPIOMsg gpio_msg;
 
     for(;;){
-        while(xQueueReceive(gpio_queue, &mqtt_msg, NULL) != errQUEUE_EMPTY){
-            gpio_handler_write(mqtt_msg.gpio, mqtt_msg.status);
-            printf("write gpio-> %d:", mqtt_msg.gpio);    
-            printf("%d\n", mqtt_msg.status);
+        while(xQueueReceive(gpio_queue, &gpio_msg, NULL) != errQUEUE_EMPTY){
+            gpio_handler_write(gpio_msg.gpio, gpio_msg.status);            
         }
 
         vTaskDelay(1000 / portTICK_PERIOD_MS);
@@ -114,7 +124,7 @@ void gpio_handler_config_gpios(){
     io_conf.pin_bit_mask = gpio_handler_get_output_mask(); // Toma la mascara de bit de gpios de entrada
     io_conf.pull_down_en = 0;//disable pull-down mode
     io_conf.pull_up_en = 0;//disable pull-up mode    
-    //gpio_config(&io_conf);//configure GPIO with the given settings
+    gpio_config(&io_conf);//configure GPIO with the given settings
 
     io_conf.intr_type = GPIO_INTR_ANYEDGE;//interrupt of rising edge
     io_conf.pin_bit_mask = gpio_handler_get_input_mask();
@@ -191,11 +201,12 @@ static uint64_t gpio_handler_get_input_mask(){
 
 static uint64_t gpio_handler_get_output_mask(){
     uint64_t output = 0;
-  
+    printf("GPIO BEFORE: %llu\n", output);
     output |= 1ULL<<GPIO_DO01;
     output |= 1ULL<<GPIO_DO02;
     output |= 1ULL<<GPIO_DO03;
     output |= 1ULL<<GPIO_DO04;
+    printf("GPIO AFTER: %llu\n", output);
 
     return output;
 }

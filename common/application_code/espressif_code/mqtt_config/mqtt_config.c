@@ -231,24 +231,23 @@ static MQTTBool_t mqtt_config_subs_callback(void * pvUserData, const MQTTPublish
         uint32_t gpio = 0;
         uint32_t status = 0;
 
-        printf("R = %d\n", r);
         for (int i = 1; i < r; i++) {
             memset( value, 0x00, JSON_VALUE_LEN);
             strncpy(value, cBuffer + t[i+1].start, t[i+1].end-t[i+1].start);
             if (jsoneq(cBuffer, &t[i], "GPIO_DO01") == 0) {
-                printf("GPIO_DO01: %s\n", value);
+                //printf("GPIO_DO01: %s\n", value);
                 gpio = 1;
                 i++;                
             } else if (jsoneq(cBuffer, &t[i], "GPIO_DO02") == 0) {
-                printf("GPIO_DO02: %s\n", value);
+                //printf("GPIO_DO02: %s\n", value);
                 gpio = 2;
                 i++;
             } else if (jsoneq(cBuffer, &t[i], "GPIO_DO03") == 0) {
-                printf("GPIO_DO03: %s\n", value);
+                //printf("GPIO_DO03: %s\n", value);
                 gpio = 3;
                 i++;
             } else if (jsoneq(cBuffer, &t[i], "GPIO_DO04") == 0) {
-                printf("GPIO_DO04: %s\n", value);
+                //printf("GPIO_DO04: %s\n", value);
                 gpio = 4;
                 i++;
             } else {
