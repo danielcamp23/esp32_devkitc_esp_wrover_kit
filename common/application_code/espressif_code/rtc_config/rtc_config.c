@@ -13,7 +13,7 @@ static uint32_t rtc_offset;
 void rtc_config_init(){
     rtc_max_block_time = pdMS_TO_TICKS(500);
     rtc_offset = 0;
-    rtc_time = 0;
+    rtc_time = 1551545822;
     rtc_mutex = xSemaphoreCreateMutex();
     //printf("TIME: configTICK_RATE_HZ %d\n", configTICK_RATE_HZ);
     //printf("TIME: RTC_CONFIG_FACTOR %d\n", RTC_CONFIG_FACTOR);

@@ -3,40 +3,10 @@
 
 #include <stdint.h>
 
-/*
- * PEM-encoded client certificate.
- *
- * Must include the PEM header and footer:
- * "-----BEGIN CERTIFICATE-----\n"\
- * "...base64 data...\n"\
- * "-----END CERTIFICATE-----"
- */
 
-/*
-//MIO
-#define keyCLIENT_CERTIFICATE_PEM \
-"-----BEGIN CERTIFICATE-----\n"\
-"MIIDWjCCAkKgAwIBAgIVAONI2X+MQ6PD1gXDWjJkOCeveIilMA0GCSqGSIb3DQEB\n"\
-"CwUAME0xSzBJBgNVBAsMQkFtYXpvbiBXZWIgU2VydmljZXMgTz1BbWF6b24uY29t\n"\
-"IEluYy4gTD1TZWF0dGxlIFNUPVdhc2hpbmd0b24gQz1VUzAeFw0xODExMTgxODAw\n"\
-"MTBaFw00OTEyMzEyMzU5NTlaMB4xHDAaBgNVBAMME0FXUyBJb1QgQ2VydGlmaWNh\n"\
-"dGUwggEiMA0GCSqGSIb3DQEBAQUAA4IBDwAwggEKAoIBAQDJCGXs6kI7RkFV4BYd\n"\
-"2XFjHQFJ3dcaxC+rPC/7wGEOFuyvY0T9SOYdhLei6nYWfJ78ohB20c43LGmcUdu0\n"\
-"/vcyPBs7lqwq/beSvJOyrVwpYjR9uZ+eoWq0d2s5R/nktwKm4e5KghgDW408fOtR\n"\
-"ODeMxvVxX0+PEYY6imrE3jRViDG6yY+hPlWFtcfacQ2rSVHFBq88xF6eIVzGjsWI\n"\
-"HcYco3fuRnB08WxVy44reTRwX3D6SWl/xFLi+OHrO6lucSXQHctkobDKUPtOVKS5\n"\
-"ftkemuxQCXRUJ2ZCTmEndofllUd3qbWml732ThQ5abA5H2j5qwjp8e3rzepzbbzP\n"\
-"2efXAgMBAAGjYDBeMB8GA1UdIwQYMBaAFGvH/qcLBAIY4YUCfTRUEoa1acDTMB0G\n"\
-"A1UdDgQWBBTrUkbnIutw8Rir51DW3qVGNHOeezAMBgNVHRMBAf8EAjAAMA4GA1Ud\n"\
-"DwEB/wQEAwIHgDANBgkqhkiG9w0BAQsFAAOCAQEAXEqhMP32AJRgXbYCZv/xpJd6\n"\
-"ojJxkSN4J8RDVFVgpeCMeFX6k1AvQ4aV/+lliti2O0YJH77oxEsYP+GGZA8Dis2V\n"\
-"66Pn7QhWDHB6lWyXZp2k2QyyS7JJPb4mVorUgsB5yxIHgVxLVXPooG8qaZKkogZ9\n"\
-"KGohwtYMvEXdQw3UjLYx3XFak0Giruqg38cn7o+R48QVBZyAS8PoUojUMh3oPhWH\n"\
-"FD6rsBOm7Qjq4n/UtfQtjEz/U400/TKfd+xqpAYqM8zU6t+gTzk+OuFincNFNVvS\n"\
-"Ay/WMxuASvaK3fHz6kz6QWR5Oiwg2N7m5ZT2nnWBH+K77Ez0hl6MZgYdtvF0TQ==\n"\
-"-----END CERTIFICATE-----"
-*/
 
+//PRUEBA DANIEL
+/*
 #define keyCLIENT_CERTIFICATE_PEM \
 "-----BEGIN CERTIFICATE-----\n"\
 "MIIDWTCCAkGgAwIBAgIUTPo1MSw4FKp8gPA07LeWJ6hzBq4wDQYJKoZIhvcNAQEL\n"\
@@ -58,51 +28,35 @@
 "QRrXeCM3wBU+qNPU2gVXl441HM41T0VBpdAlG7RsYyZ57m3SSn4Xp8C3vzwny+93\n"\
 "l3y1zkOxoUof+FYCY/UNGOOuixhrU3jjBX0j4hDIScYsUJDsVKC2pBs2WrTc\n"\
 "-----END CERTIFICATE-----"
-
-
-
-/*
- * PEM-encoded client private key.
- *
- * Must include the PEM header and footer:
- * "-----BEGIN RSA PRIVATE KEY-----\n"\
- * "...base64 data...\n"\
- * "-----END RSA PRIVATE KEY-----"
- */
-
-
-/*
-//MIO
-#define keyCLIENT_PRIVATE_KEY_PEM \
-"-----BEGIN RSA PRIVATE KEY-----\n"\
-"MIIEpAIBAAKCAQEAyQhl7OpCO0ZBVeAWHdlxYx0BSd3XGsQvqzwv+8BhDhbsr2NE\n"\
-"/UjmHYS3oup2Fnye/KIQdtHONyxpnFHbtP73MjwbO5asKv23kryTsq1cKWI0fbmf\n"\
-"nqFqtHdrOUf55LcCpuHuSoIYA1uNPHzrUTg3jMb1cV9PjxGGOopqxN40VYgxusmP\n"\
-"oT5VhbXH2nENq0lRxQavPMReniFcxo7FiB3GHKN37kZwdPFsVcuOK3k0cF9w+klp\n"\
-"f8RS4vjh6zupbnEl0B3LZKGwylD7TlSkuX7ZHprsUAl0VCdmQk5hJ3aH5ZVHd6m1\n"\
-"ppe99k4UOWmwOR9o+asI6fHt683qc228z9nn1wIDAQABAoIBAHrhOkQdUMygffE6\n"\
-"3unx7p/xq8b15bTDtIuLZ50Pk4OkOZpfKF1VwOrMI99eRz4pgJjVixDF37HT4N4f\n"\
-"Hxe8PWckXFUJHUXN/fagc/tkgg/9qi4rV0kES4/x6sWBnFrUDrfpI9nBOWJcBLGz\n"\
-"fbcQkMvpFT/uTVgbExwXXXnmhMC+PyvEIPe5EOhB2G4PkCpRuFrYHncic9k9cBXI\n"\
-"p4daRwIA6U3gNFeKWnwNsVDp7z/YVZ0/qUbVIHYzic8ZBFhh6YJr5JbvjOKU0V3J\n"\
-"51EKbiKcNlSrjd8bhLjo/NAAD3mBRSFoBBB26aPn8Qw+tHjIqNPV00O9iDMdZzXB\n"\
-"5QBkHTECgYEA+6WgYCxZTTzhRRtfpcYwn2i3uoIhznvYCSjLOpqRVoegw8UYugJR\n"\
-"Cc3lPoHRgakR4xcPrIbLL4HWFgJ56mNN8JGInSELEZ/o1y9wgAIRlz+/fDD525ut\n"\
-"QTC2o/oiMZz10xFhlerxA7VdRs5j8+Ndke0mZPLTrJl52fz3HTRyGs8CgYEAzIKi\n"\
-"yXODmqIJqCAb4OhWVFoEf1bGxAcA1HLlxMM3+coKQWTWdFN8uAwCx2E966fycoG0\n"\
-"IIjXc5xqNgvSsPTE1SqcEDQvqhLSMwuQejQdaY/n4x7Whnim58yvXd/gYij/X4YK\n"\
-"vU8H5UNt4qpfra2jt6R4EdDO2KVwuVUnsEqABHkCgYEAkrqnQYx6YYve+hGU+q8O\n"\
-"CNThVDGujpwtgmGz5i7cEa0xcxUIbuUM5X+VbJX7V/QCBvyaWgmajc/RybGV7rIK\n"\
-"bvwcwSnUL2mjNV1m5mzOXvd/qmVQOtmR8xH5XLFroKwZtgFLekOsVnI4uiF7rGhl\n"\
-"VcIGghQIknpGz3EtkWzUH4cCgYEAh1WXtiosF+NM8qY07LOzlWRwf3gEVuqvgOd7\n"\
-"56asXy91c+rwA9DPwten6xsNp+nfBimQ8sq7kPUcUCGozpNbwhjNZ+ew9yI3WbI4\n"\
-"bLYaFKY3dNQOcLRc9x47mqqxSSQKQsNoTfiDqBLkH9BROpSit78t+dQtXa61lt+k\n"\
-"QQQ8DTkCgYBHvuCKJOwInOeimwlMJ9czLkl9t+xXFpUL/DNHCANjV2MyDP+0R5ao\n"\
-"mUHEQHLv6dUHmtl/QW0qWBU/qj1z7cAS4PrUE7Luflf9Tgub8cpVMOBaEvB/InKs\n"\
-"rc7QmkPCzh8GUmEie4z07mHcURbDci6vpod33in6vRMqcfrIY/t/ww==\n"\
-"-----END RSA PRIVATE KEY-----"
 */
 
+
+//PRUEBA ACUA_MARZO_02
+#define keyCLIENT_CERTIFICATE_PEM \
+"-----BEGIN CERTIFICATE-----\n"\
+"MIIDWjCCAkKgAwIBAgIVAKqOCeuivcaPk7UIUU9Whl7rbphiMA0GCSqGSIb3DQEB\n"\
+"CwUAME0xSzBJBgNVBAsMQkFtYXpvbiBXZWIgU2VydmljZXMgTz1BbWF6b24uY29t\n"\
+"IEluYy4gTD1TZWF0dGxlIFNUPVdhc2hpbmd0b24gQz1VUzAeFw0xOTAzMDIxNTUy\n"\
+"MjBaFw00OTEyMzEyMzU5NTlaMB4xHDAaBgNVBAMME0FXUyBJb1QgQ2VydGlmaWNh\n"\
+"dGUwggEiMA0GCSqGSIb3DQEBAQUAA4IBDwAwggEKAoIBAQCvYbllNpkrg4j/fAJ+\n"\
+"KbE1Vp5vTLeE/XFU4LHcPHjvmWKcJMUd+9esUl6mObl0cdX2x0j6lsO5/m9vFLPb\n"\
+"uigPrRUudmykI7syGYf5zIRwX7tfkodWfIhlool8pEdP6evfxn35RIsvgSu6KtFb\n"\
+"gGbAcGCJkw0I1TWQXkQU3kGIg3Ox6CZf798hiRbuspCBufqPadaYLHZDE3XLkck6\n"\
+"6duJFvsZ0CrCJKdnwZo6NQpQYg5lYaZgLrTIBe2CAFFVmyjbwsTt2EstchxSJZfb\n"\
+"mn4rf3ilZPGXuaaP1PKV5NbW4xrwptv8UQ55LZchdWSpyzUTdALwlSUuhSPowreh\n"\
+"Zxt3AgMBAAGjYDBeMB8GA1UdIwQYMBaAFMDUhdYQVkCgaxe3wZ7gDr0CkGMMMB0G\n"\
+"A1UdDgQWBBRJQP8D2hvcYnLFZk9KN5SpbtBpKzAMBgNVHRMBAf8EAjAAMA4GA1Ud\n"\
+"DwEB/wQEAwIHgDANBgkqhkiG9w0BAQsFAAOCAQEAMg3y+DE50V01lptBBuEAStUZ\n"\
+"+/QgmX1ZusEwsSbe3MzRAM9vf2uNZibN0K8gkIv9W7DfUurHuj+x72FksrRgOz/m\n"\
+"9dpsc+4p4WcIkUT7gpjTpeDi35axAHmoVXBGMr4fjmmU8If+/CwKoydNDMzCyQWh\n"\
+"6ixDKnkQ6Gh27Umx+lqBc8lygvyoE8U2poewxG3HdASUEMxSr/liYqgba4PeiVgF\n"\
+"puTO9VHnAtXL9yaY8Man0ed2zIGJrjF73vxHvj+GEiBcTgd7/QELUu+vnJOc7tDG\n"\
+"0Hk8w5kYzeB5R+evujb6Gy6CCJcxkRUOJMy+mnMxrJ9OUTYtdSqMRHgoCxzSHQ==\n"\
+"-----END CERTIFICATE-----"
+
+
+//PRUEBA DANIEL
+/*
 #define keyCLIENT_PRIVATE_KEY_PEM \
 "-----BEGIN RSA PRIVATE KEY-----\n"\
 "MIIEogIBAAKCAQEA0NFCmW7j4rL82k2bfDBIBU6iaVul/kaw30I93etsel7Pn+Wh\n"\
@@ -131,27 +85,39 @@
 "3hbvwZvZUy2nCboCGYnYqK523fxlo9Na/lpu/8IB8m2CR1pzQzxi9uUcCHUKLKQQ\n"\
 "C37jo1/TK/II3XE2YrW9BDclFhMgHRslGjj4cPwNWXeinIZmjIE=\n"\
 "-----END RSA PRIVATE KEY-----"
+*/
 
-/*
- * PEM-encoded Just-in-Time Registration (JITR) certificate (optional).
- *
- * If used, must include the PEM header and footer:
- * "-----BEGIN CERTIFICATE-----\n"\
- * "...base64 data...\n"\
- * "-----END CERTIFICATE-----"
- */
+#define keyCLIENT_PRIVATE_KEY_PEM \
+"-----BEGIN RSA PRIVATE KEY-----\n"\
+"MIIEpAIBAAKCAQEAr2G5ZTaZK4OI/3wCfimxNVaeb0y3hP1xVOCx3Dx475linCTF\n"\
+"HfvXrFJepjm5dHHV9sdI+pbDuf5vbxSz27ooD60VLnZspCO7MhmH+cyEcF+7X5KH\n"\
+"VnyIZaKJfKRHT+nr38Z9+USLL4EruirRW4BmwHBgiZMNCNU1kF5EFN5BiINzsegm\n"\
+"X+/fIYkW7rKQgbn6j2nWmCx2QxN1y5HJOunbiRb7GdAqwiSnZ8GaOjUKUGIOZWGm\n"\
+"YC60yAXtggBRVZso28LE7dhLLXIcUiWX25p+K394pWTxl7mmj9TyleTW1uMa8Kbb\n"\
+"/FEOeS2XIXVkqcs1E3QC8JUlLoUj6MK3oWcbdwIDAQABAoIBAB7Kd3Qvm8Cp/Tlt\n"\
+"mjpwM2574KEFxQqSPH18XX2fGFRoh4mGYx0ahAj7BScF52tsOPZ0knl8Uqyq4QGN\n"\
+"ju46xqHJ73gSzowawdjP5rGSmIXqKMlkvmIOxxug56Z8aRC8ru7AuIk04YLbmMO8\n"\
+"lLkN1/xdPnWo3Zb5Z8gK5MUNKFBBCSd/Hu0SCaNpCh0N5LU7f3aK+0aMckhrz/7B\n"\
+"RUwSfmPPjvh3zzvsmt0gJwmuvSXWfHUkPSCF5IbzHV09pCm72T2tZ1xrWbw+HvdW\n"\
+"/pdThyiZojy9EZoLAZMSWaNqLHxapAhFD0zE+FBQBFZQHklw3+8fv5m9yhdIE/Wp\n"\
+"heNu5iECgYEA6Q8Zkz+XG7MHSnBDh0e7hm86OyIJCJum0+bbrAJ8uZsyxou+bSnP\n"\
+"qec0mJr8fHGudgFwsRDIbs5j3K+L5b7LTZeZ9QQI8aQw69wKsWByXDXmODOfeari\n"\
+"h4YOHV3q6wkab5OFoEB1aZHkrltC4r111F0oabt4Z2PfrTDluO4QkW8CgYEAwKU0\n"\
+"J8qqZwVAwKe6a/z7XiR+D+ywSsrX0fBuStiUxTtotFqn+WgwLCSBWBYU2Q9B8IF5\n"\
+"B1wPE856O4hjCNxc5SfMrVeHCUUWCxg2zWvYvItc8Ab9h24vGnP/EC8214AyqAGS\n"\
+"cniGlVhNvsKglWD7l/qyVFXJqpbB3uUhOJ3IgnkCgYB28FPXB+7wHe+sl5p+4abc\n"\
+"Nst6/iWqFPWQ0xJsuGA6wO+q0AqA34Oxa+M1tnMAd2vXoWiHlM8VbZMdPyGgQDy0\n"\
+"/pd9qW9/EpI87HEwkM4MLR2utPnAN+ufylRNvG51QJITOzBI1lyVYfVY3g5GdPY7\n"\
+"SMelHh2Wdivi0T+Ln0MpVQKBgQCGckWGB9EI+QeJ7QUT3Ijp2PoJzxvx9sLMh8nR\n"\
+"fnnFdILMbACS9X25MPj8Ktz958ITQajf1AXJwu5XogXL508FttMHnvBlLcwGji2h\n"\
+"C8VFQNXpxlcmL2W8RnwaJXlWyOeRjRdRwH/ctrX7jgVYe0jbdmECrqSB45kGIE8h\n"\
+"Hi0TsQKBgQDnkPOl/1sjGy7+fk/42NPwukocvI32+I+qhPbSyJpEz4LlUmSFfY7s\n"\
+"MdtNhNp8EXvUbSAAt+5cv2ilDdffNHwSFhjdy3Pp+EU2cOAawx57d1DCOCH/D+yB\n"\
+"RDm6+6errXjWcJjYVsHbviol+/+v7qmatYRj+mVheV2OZmxDiL5Lkw==\n"\
+"-----END RSA PRIVATE KEY-----"
+
 
 #define keyJITR_DEVICE_CERTIFICATE_AUTHORITY_PEM  NULL
 
 
-/* The constants above are set to const char * pointers defined in aws_dev_mode_key_provisioning.c,
- * and externed here for use in C files.  NOTE!  THIS IS DONE FOR CONVENIENCE
- * DURING AN EVALUATION PHASE AND IS NOT GOOD PRACTICE FOR PRODUCTION SYSTEMS
- * WHICH MUST STORE KEYS SECURELY. */
-//extern const char clientcredentialCLIENT_CERTIFICATE_PEM[];
-//extern const char* clientcredentialJITR_DEVICE_CERTIFICATE_AUTHORITY_PEM;
-//extern const char clientcredentialCLIENT_PRIVATE_KEY_PEM[];
-//extern const uint32_t clientcredentialCLIENT_CERTIFICATE_LENGTH;
-//extern const uint32_t clientcredentialCLIENT_PRIVATE_KEY_LENGTH;
-
-#endif /* AWS_CLIENT_CREDENTIAL_KEYS_H */
+#endif 

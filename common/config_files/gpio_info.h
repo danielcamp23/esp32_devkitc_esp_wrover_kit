@@ -5,11 +5,19 @@
 #define GPIO_DI02      39   /* GPIO39 */
 #define GPIO_DI03      34   /* GPIO33 */
 #define GPIO_DI04      35   /* GPIO35 */
-
 #define GPIO_DI05      19   /* GPIO19 */
 #define GPIO_DI06      23   /* GPIO23 */
 #define GPIO_DI07      22   /* GPIO22 */
 #define GPIO_DI08      21   /* GPIO21 */
+
+#define DI01_NAME "DI01"
+#define DI02_NAME "DI02"
+#define DI03_NAME "DI03"
+#define DI04_NAME "DI04"
+#define DI05_NAME "DI05"
+#define DI06_NAME "DI06"
+#define DI07_NAME "DI07"
+#define DI08_NAME "DI08"
 
 
 //PRUEBA DE GPIOS EN LA MISMA DIRECCION DE ADC
@@ -32,6 +40,11 @@
 #define GPIO_DO02       2   // GPIO07 
 #define GPIO_DO03       4   // GPIO06 
 #define GPIO_DO04      16   // GPIO11 
+
+#define DO01_NAME "DO01"
+#define DO02_NAME "DO02"
+#define DO03_NAME "DO03"
+#define DO04_NAME "DO04"
 
 /*
 Poner en "1" o "0" las entradas digitales del ESP que se van a conectar.

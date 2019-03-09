@@ -9,10 +9,8 @@ void queue_conf_init(){
     gpio_queue = xQueueCreate(15, sizeof(struct GPIOMsg));
 }
 
-void queue_conf_send_mqtt(uint32_t _gpio, uint32_t _status){
-     mqtt_msg.gpio = _gpio;
-     mqtt_msg.status = _status;
-    xQueueSendToBack(mqtt_queue, &mqtt_msg, 0);
+void queue_conf_send_mqtt(struct MqttMsg msg){
+    xQueueSendToBack(mqtt_queue, &msg, 0);
 }
 
 void queue_conf_send_gpio(uint32_t _gpio, uint32_t _status){

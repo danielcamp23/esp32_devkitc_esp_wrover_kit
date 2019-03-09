@@ -67,7 +67,7 @@ int app_main( void ){
         rtc_config_init();
         wifi_config_init();
         //ota_client_init();
-        //analog_handler_init();
+        analog_handler_init();
         udp_req_init();
 
 

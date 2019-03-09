@@ -1,43 +1,46 @@
 #include "analog_handler.h"
 #include "analog_handler_static.h"
 #include "analog_info.h"
+
+
 #include "task_config.h"
 #include "driver/adc.h"
 #include "esp_adc_cal.h"
 #include "freertos/FreeRTOS.h"
 #include "freertos/task.h"
+#include "queue_conf.h"
 
 
 static esp_adc_cal_characteristics_t *adc_chars;
 //static const adc_channel_t channel = ADC_CHANNEL_6;     //GPIO34 if ADC1, GPIO14 if ADC2
-static const adc_atten_t atten = ADC_ATTEN_DB_0;
+static const adc_atten_t atten = ADC_ATTEN_DB_11;
 static const adc_unit_t unit = ADC_UNIT_1; //TODO por revisar - al parecer solo funciona el módulo 1
 
 void analog_handler_init(){
-    analog_handler_check_efuse();
+    //analog_handler_check_efuse();
 
     //Configure ADC
   
     if (unit == ADC_UNIT_1) {
         adc1_config_width(ADC_WIDTH_BIT_12);
 
-        if(USE_GPIO_AN01){
-            adc1_config_channel_atten(GPIO_AN01, atten);
+        if(USE_AN01){
+            adc1_config_channel_atten(AN01, atten);
         }
-        if(USE_GPIO_AN02){
-            adc1_config_channel_atten(GPIO_AN02, atten);
+        if(USE_AN02){
+            adc1_config_channel_atten(AN02, atten);
         }
-        if(USE_GPIO_AN03){
-            adc2_config_channel_atten(GPIO_AN03, atten);
+        if(USE_AN03){
+            adc2_config_channel_atten(AN03, atten);
         }
-        if(USE_GPIO_AN04){
-            adc2_config_channel_atten(GPIO_AN04, atten);
+        if(USE_AN04){
+            adc2_config_channel_atten(AN04, atten);
         }
-        if(USE_GPIO_AN05){
-            adc2_config_channel_atten(GPIO_AN05, atten);
+        if(USE_AN05){
+            adc2_config_channel_atten(AN05, atten);
         }
-        if(USE_GPIO_AN06){
-            adc2_config_channel_atten(GPIO_AN06, atten);
+        if(USE_AN06){
+            adc2_config_channel_atten(AN06, atten);
         }                                                        
     } 
 
@@ -71,45 +74,51 @@ void analog_handler_init(){
 }
 
 void analog_handler_task(void * pvParameters){
+    struct MqttMsg mqtt_msg;
+    bool init = false;
+    uint32_t adc_reading_an01 = 0;
+    uint32_t adc_reading_an02 = 0;
+    uint32_t adc_reading_an03 = 0;
+    uint32_t adc_reading_an04 = 0;
+    uint32_t adc_reading_an05 = 0;
+    uint32_t adc_reading_an06 = 0;
+    uint32_t an01_last_read = 0;
+    uint32_t an02_last_read = 0;
+    uint32_t an03_last_read = 0;
+    uint32_t an04_last_read = 0;
+    uint32_t an05_last_read = 0;
+    uint32_t an06_last_read = 0;
+    int raw;
     for(;;){
-        uint32_t adc_reading_an01 = 0;
-        uint32_t adc_reading_an02 = 0;
-        uint32_t adc_reading_an03 = 0;
-        uint32_t adc_reading_an04 = 0;
-        uint32_t adc_reading_an05 = 0;
-        uint32_t adc_reading_an06 = 0;
 
-        uint32_t an01_last_read = 0;
-        uint32_t an02_last_read = 0;
-        uint32_t an03_last_read = 0;
-        uint32_t an04_last_read = 0;
-        uint32_t an05_last_read = 0;
-        uint32_t an06_last_read = 0;
-
-        int raw;
-        bool init = false;
+        adc_reading_an01 = 0;
+        adc_reading_an02 = 0;
+        adc_reading_an03 = 0;
+        adc_reading_an04 = 0;
+        adc_reading_an05 = 0;
+        adc_reading_an06 = 0;
         
         for(int i = 0 ; i < NO_OF_SAMPLES; ++i) {
-            if(USE_GPIO_AN01){
-                adc_reading_an01 += adc1_get_raw((adc1_channel_t)GPIO_AN01);
+            if(USE_AN01){
+                adc_reading_an01 += adc1_get_raw((adc1_channel_t)AN01);
             }
-            if(USE_GPIO_AN02){
-                adc_reading_an02 += adc1_get_raw((adc1_channel_t)GPIO_AN02);
+            if(USE_AN02){
+                adc_reading_an02 += adc1_get_raw((adc1_channel_t)AN02);
             }
-            if(USE_GPIO_AN03){
-                (void)adc2_get_raw((adc2_channel_t)GPIO_AN03, ADC_WIDTH_BIT_12, &raw);
+            if(USE_AN03){
+                (void)adc2_get_raw((adc2_channel_t)AN03, ADC_WIDTH_BIT_12, &raw);
                 adc_reading_an03 += raw;
             }
-            if(USE_GPIO_AN04){
-                (void)adc2_get_raw((adc2_channel_t)GPIO_AN04, ADC_WIDTH_BIT_12, &raw);
+            if(USE_AN04){
+                (void)adc2_get_raw((adc2_channel_t)AN04, ADC_WIDTH_BIT_12, &raw);
                 adc_reading_an04 += raw;
             }
-            if(USE_GPIO_AN05){
-                (void)adc2_get_raw((adc2_channel_t)GPIO_AN05, ADC_WIDTH_BIT_12, &raw);
+            if(USE_AN05){
+                (void)adc2_get_raw((adc2_channel_t)AN05, ADC_WIDTH_BIT_12, &raw);
                 adc_reading_an05 += raw;
             }
-            if(USE_GPIO_AN06){
-                (void)adc2_get_raw((adc2_channel_t)GPIO_AN06, ADC_WIDTH_BIT_12, &raw);
+            if(USE_AN06){
+                (void)adc2_get_raw((adc2_channel_t)AN06, ADC_WIDTH_BIT_12, &raw);
                 adc_reading_an06 += raw;
             }
         }
@@ -123,34 +132,52 @@ void analog_handler_task(void * pvParameters){
 
 
         if(init){
-            if(USE_GPIO_AN01){
+            if(USE_AN01){
                 if(analog_handler_compare(an01_last_read, adc_reading_an01)){
                     an01_last_read = adc_reading_an01;
+                    mqtt_msg.status = an01_last_read;
+                    snprintf(mqtt_msg.name, 10, "%s", AN01_NAME);
+                    queue_conf_send_mqtt(mqtt_msg);
                 }
             }
-            if(USE_GPIO_AN02){
+            if(USE_AN02){
                 if(analog_handler_compare(an02_last_read, adc_reading_an02)){
-                    an02_last_read = adc_reading_an02;                    
+                    an02_last_read = adc_reading_an02;          
+                    mqtt_msg.status = an02_last_read;
+                    snprintf(mqtt_msg.name, 10, "%s", AN02_NAME);          
+                    queue_conf_send_mqtt(mqtt_msg);
                 }
             }
-            if(USE_GPIO_AN03){
+            if(USE_AN03){
                 if(analog_handler_compare(an03_last_read, adc_reading_an03)){
-                    an03_last_read = adc_reading_an03;                    
+                    an03_last_read = adc_reading_an03;
+                    mqtt_msg.status = an03_last_read;
+                    snprintf(mqtt_msg.name, 10, "%s", AN03_NAME);          
+                    queue_conf_send_mqtt(mqtt_msg);
                 }
             }
-            if(USE_GPIO_AN04){
+            if(USE_AN04){
                 if(analog_handler_compare(an04_last_read, adc_reading_an04)){
-                    an04_last_read = adc_reading_an04;                    
+                    an04_last_read = adc_reading_an04;
+                    mqtt_msg.status = an04_last_read;
+                    snprintf(mqtt_msg.name, 10, "%s", AN04_NAME);          
+                    queue_conf_send_mqtt(mqtt_msg);
                 }
             }
-            if(USE_GPIO_AN05){
+            if(USE_AN05){
                 if(analog_handler_compare(an05_last_read, adc_reading_an05)){
-                    an05_last_read = adc_reading_an05;                    
+                    an05_last_read = adc_reading_an05;
+                    mqtt_msg.status = an05_last_read;
+                    snprintf(mqtt_msg.name, 10, "%s", AN05_NAME);          
+                    queue_conf_send_mqtt(mqtt_msg);
                 }
             }
-            if(USE_GPIO_AN06){
+            if(USE_AN06){
                 if(analog_handler_compare(an06_last_read, adc_reading_an06)){
-                    an06_last_read = adc_reading_an06;                    
+                    an06_last_read = adc_reading_an06;
+                    mqtt_msg.status = an06_last_read;
+                    snprintf(mqtt_msg.name, 10, "%s", AN06_NAME);          
+                    queue_conf_send_mqtt(mqtt_msg);
                 }
             }
         }
@@ -164,13 +191,6 @@ void analog_handler_task(void * pvParameters){
             init = true;
         }
 
-
-
-        
-        /*printf("adc_reading_an01: %d\n", adc_reading_an01);
-        printf("adc_reading_an02: %d\n", adc_reading_an02);*/
-        //TODO comentado por pruebas
-        init = true;
         vTaskDelay(500 / portTICK_PERIOD_MS);
     }
 }

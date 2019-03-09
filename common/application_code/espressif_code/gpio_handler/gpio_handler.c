@@ -76,6 +76,7 @@ void gpio_handler_read_task(void * pvParameters){
     bool report_change = false;
     int prev_status = 0;
     int curr_status = 0;
+
     for(;;){
         while(xQueueReceiveFromISR(gpio_evt_queue, &gpio, NULL) != errQUEUE_EMPTY){
             prev_status = gpio_handler_read(gpio);
@@ -92,9 +93,35 @@ void gpio_handler_read_task(void * pvParameters){
             if(prev_status == curr_status){
                 mqtt_msg.gpio = gpio;
                 mqtt_msg.status = curr_status;
-                queue_conf_send_mqtt(gpio, curr_status);
-                //xQueueSendToBack(mqtt_queue, &mqtt_msg, 0);
-                printf("GPIO: %d -- %d\n", gpio, curr_status);
+
+                switch(gpio){
+                    case GPIO_DI01:
+                        snprintf(mqtt_msg.name, 10, "%s", DI01_NAME);
+                        break;
+                    case GPIO_DI02:
+                        snprintf(mqtt_msg.name, 10, "%s", DI02_NAME);
+                        break;
+                    case GPIO_DI03:
+                        snprintf(mqtt_msg.name, 10, "%s", DI03_NAME);
+                        break;
+                    case GPIO_DI04:
+                        snprintf(mqtt_msg.name, 10, "%s", DI04_NAME);
+                        break;
+                    case GPIO_DI05:
+                        snprintf(mqtt_msg.name, 10, "%s", DI05_NAME);
+                        break;
+                    case GPIO_DI06:
+                        snprintf(mqtt_msg.name, 10, "%s", DI06_NAME);
+                        break;
+                    case GPIO_DI07:
+                        snprintf(mqtt_msg.name, 10, "%s", DI07_NAME);
+                        break;
+                    case GPIO_DI08:
+                        snprintf(mqtt_msg.name, 10, "%s", DI08_NAME);
+                        break;                                                                                                                                                                        
+                }
+
+                queue_conf_send_mqtt(mqtt_msg);
             }
         }
 

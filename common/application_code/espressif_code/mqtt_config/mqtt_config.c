@@ -4,6 +4,7 @@
 #include "task_config.h"
 #include "flags.h"
 #include "queue_conf.h"
+#include "gpio_info.h"
 
 #include "string.h"
 #include "stdio.h"
@@ -13,6 +14,7 @@
 #include "message_buffer.h"
 #include "aws_mqtt_agent.h"
 #include "aws_hello_world.h"
+#include "rtc_config.h"
 #include "jsmn.h"
 
 
@@ -64,9 +66,9 @@ void mqtt_config_task(void * pvParameters){
     for(;;){
         if(xQueueReceive(mqtt_queue, &mqtt_msg, 0 )){//Lee si hay items en la cola
             mqtt_config_report_status(mqtt_msg);
-
-        }
-        vTaskDelay(1000 / portTICK_PERIOD_MS);
+        } 
+        //mqtt_config_report_status(mqtt_msg);
+        vTaskDelay(5000 / portTICK_PERIOD_MS);
     }
 
 
@@ -86,8 +88,9 @@ void mqtt_config_report_status(struct MqttMsg mqtt_msg){
     MQTTAgentPublishParams_t xPublishParameters;
     char cDataBuffer[ MQTT_MAX_DATA_LENGTH ];
 
-    ( void ) snprintf( cDataBuffer, MQTT_MAX_DATA_LENGTH, "{\"data\": %s, \"date\":1543717507, \"connection\":true}", (mqtt_msg.status ? "1.0" : "0.0") );
-    memset( &( xPublishParameters ), 0x00, sizeof( xPublishParameters ) );
+    (void)snprintf( cDataBuffer, MQTT_MAX_DATA_LENGTH, "{\"parameter\": \"%s\", \"value\": %d, \"date\": %d, \"connection\":true}", mqtt_msg.name, mqtt_msg.status , rtc_config_get_time());
+    printf("%s\n", cDataBuffer);
+    memset(&(xPublishParameters), 0x00, sizeof(xPublishParameters));
     xPublishParameters.pucTopic = MQTT_PUBLISH_TOPIC;
     xPublishParameters.pvData = cDataBuffer;
     xPublishParameters.usTopicLength = ( uint16_t ) strlen( ( const char * ) MQTT_PUBLISH_TOPIC );
@@ -158,7 +161,7 @@ static BaseType_t mqtt_config_subcribe(void){
     MQTTAgentReturnCode_t xReturned;
     BaseType_t xReturn;
     MQTTAgentSubscribeParams_t xSubscribeParams;
-    printf("TOPIC: %s\n", MQTT_SUBSCRIBE_TOPIC);
+    //printf("TOPIC: %s\n", MQTT_SUBSCRIBE_TOPIC);
     /* Setup subscribe parameters to subscribe to MQTT_SUBSCRIBE_TOPIC topic. */
     xSubscribeParams.pucTopic = MQTT_SUBSCRIBE_TOPIC;
     xSubscribeParams.pvPublishCallbackContext = NULL;
@@ -234,20 +237,16 @@ static MQTTBool_t mqtt_config_subs_callback(void * pvUserData, const MQTTPublish
         for (int i = 1; i < r; i++) {
             memset( value, 0x00, JSON_VALUE_LEN);
             strncpy(value, cBuffer + t[i+1].start, t[i+1].end-t[i+1].start);
-            if (jsoneq(cBuffer, &t[i], "GPIO_DO01") == 0) {
-                //printf("GPIO_DO01: %s\n", value);
+            if (jsoneq(cBuffer, &t[i], DO01_NAME) == 0) {
                 gpio = 1;
                 i++;                
-            } else if (jsoneq(cBuffer, &t[i], "GPIO_DO02") == 0) {
-                //printf("GPIO_DO02: %s\n", value);
+            } else if (jsoneq(cBuffer, &t[i], DO02_NAME) == 0) {
                 gpio = 2;
                 i++;
-            } else if (jsoneq(cBuffer, &t[i], "GPIO_DO03") == 0) {
-                //printf("GPIO_DO03: %s\n", value);
+            } else if (jsoneq(cBuffer, &t[i], DO03_NAME) == 0) {            
                 gpio = 3;
                 i++;
-            } else if (jsoneq(cBuffer, &t[i], "GPIO_DO04") == 0) {
-                //printf("GPIO_DO04: %s\n", value);
+            } else if (jsoneq(cBuffer, &t[i], DO04_NAME) == 0) {
                 gpio = 4;
                 i++;
             } else {
