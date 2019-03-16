@@ -12,5 +12,9 @@
 void rtc_config_init();
 uint32_t rtc_config_get_time();
 
+void rtc_config_set_time_(char * timeString, int len);
+
+
+
 #endif
 

@@ -249,7 +249,11 @@ static MQTTBool_t mqtt_config_subs_callback(void * pvUserData, const MQTTPublish
             } else if (jsoneq(cBuffer, &t[i], DO04_NAME) == 0) {
                 gpio = 4;
                 i++;
-            } else {
+            }else if (jsoneq(cBuffer, &t[i], "hora") == 0) {
+                gpio = 0;
+                i++; 
+                rtc_config_set_time_(value, 0);
+            }else {
                 printf("Unexpected key: %.*s\n", t[i].end-t[i].start,
                         cBuffer + t[i].start);
                 i++;                        

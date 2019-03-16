@@ -3,6 +3,7 @@
 #include "wifi_config.h"
 #include "wifi_info.h"
 #include "flags.h"
+#include "udp_request.h"
 /* FreeRTOS includes. */
 #include "FreeRTOS.h"
 #include "task.h"
@@ -308,6 +309,7 @@ void wifi_config_task(void * pvParameters){
                 connecting = false; 
                 configPRINTF( ( "WiFi connected!\r\n") );
                 flags_set_wifi_connected();
+                vStandardSendExample();
             }
             else{
                 configPRINTF( ( "Unable to CONNECT...\r\n" ) );
