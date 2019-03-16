@@ -5,7 +5,7 @@ static struct MqttMsg mqtt_msg;
 static struct GPIOMsg gpio_msg;
 
 void queue_conf_init(){
-    mqtt_queue = xQueueCreate(5, sizeof(struct MqttMsg));
+    mqtt_queue = xQueueCreate(20, sizeof(struct MqttMsg));
     gpio_queue = xQueueCreate(15, sizeof(struct GPIOMsg));
 }
 

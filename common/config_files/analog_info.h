@@ -3,22 +3,22 @@
  
 
 #define NO_OF_SAMPLES   64     //Numero de muestras para promediar valor analógico
-#define ANALOG_RANGE 10         //Rango de detección de cambio en entrada analógica
+#define ANALOG_RANGE 50         //Rango de detección de cambio en entrada analógica
 
 
-#define AN01      ADC1_CHANNEL_4 /*!< ADC1 channel 4 is GPIO32 */
-#define AN02      ADC1_CHANNEL_5 /*!< ADC1 channel 5 is GPIO33 */
-#define AN03      ADC2_CHANNEL_8 /*!< ADC2 channel 8 is GPIO25 */
-#define AN04      ADC2_CHANNEL_9 /*!< ADC2 channel 9 is GPIO26 */
-#define AN05      ADC2_CHANNEL_7 /*!< ADC2 channel 7 is GPIO27 */
-#define AN06      ADC2_CHANNEL_6 /*!< ADC2 channel 6 is GPIO14 */
+#define AN01      ADC1_CHANNEL_0 /*!< ADC1 channel 9 is GPIO36 */
+#define AN02      ADC1_CHANNEL_3 /*!< ADC1 channel 8 is GPIO39 */
+#define AN03      ADC1_CHANNEL_6 /*!< ADC1 channel 7 is GPIO34 */
+#define AN04      ADC1_CHANNEL_7 /*!< ADC1 channel 6 is GPIO35 */
+#define AN05      ADC1_CHANNEL_4 /*!< ADC1 channel 4 is GPIO32 */
+#define AN06      ADC1_CHANNEL_5 /*!< ADC1 channel 5 is GPIO33 */
 
-#define AN01_NAME "AN01"
-#define AN02_NAME "AN02"
-#define AN03_NAME "AN03"
-#define AN04_NAME "AN04"
-#define AN05_NAME "AN05"
-#define AN06_NAME "AN06"
+#define AN01_NAME "AI01"
+#define AN02_NAME "AI02"
+#define AN03_NAME "AI03"
+#define AN04_NAME "AI04"
+#define AN05_NAME "AI05"
+#define AN06_NAME "AI06"
 
 
 
@@ -28,9 +28,9 @@ Esto para poder leer el valoy y compar con deltas para el disoaro de mensajes/al
 */
 #define USE_AN01   1
 #define USE_AN02   1
-#define USE_AN03   0
-#define USE_AN04   0
-#define USE_AN05   0
-#define USE_AN06   0
+#define USE_AN03   1
+#define USE_AN04   1
+#define USE_AN05   1
+#define USE_AN06   1
 
 #endif

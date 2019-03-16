@@ -42,7 +42,6 @@ void gpio_handler_init(){
 static void IRAM_ATTR gpio_handler_ISR(void* arg){
     uint32_t gpio_num = (uint32_t) arg;
     //printf("status: %d - %d\n", gpio_num, gpio_handler_read(gpio_num));    
-
     xQueueSendFromISR(gpio_evt_queue, &gpio_num, NULL);
 }
 
@@ -76,9 +75,9 @@ void gpio_handler_read_task(void * pvParameters){
     bool report_change = false;
     int prev_status = 0;
     int curr_status = 0;
-
+    BaseType_t xTaskWokenByReceive = pdFALSE;
     for(;;){
-        while(xQueueReceiveFromISR(gpio_evt_queue, &gpio, NULL) != errQUEUE_EMPTY){
+        while(xQueueReceiveFromISR(gpio_evt_queue, &gpio, NULL)){
             prev_status = gpio_handler_read(gpio);
             interrupt_time = rtc_config_get_time();
             report_change = true;
@@ -87,13 +86,15 @@ void gpio_handler_read_task(void * pvParameters){
 
         }
 
-        if( report_change && (rtc_config_get_time() - interrupt_time > 100)){
+        if( report_change &&  (rtc_config_get_time() - interrupt_time > 50) ){
             curr_status = gpio_handler_read(gpio);
             report_change = false;
             if(prev_status == curr_status){
                 mqtt_msg.gpio = gpio;
                 mqtt_msg.status = curr_status;
 
+                //printf("status: %d\n", prev_status);    
+                //printf("GPIO: %d -- %d\n", gpio, prev_status);
                 switch(gpio){
                     case GPIO_DI01:
                         snprintf(mqtt_msg.name, 10, "%s", DI01_NAME);
@@ -125,7 +126,7 @@ void gpio_handler_read_task(void * pvParameters){
             }
         }
 
-        vTaskDelay(200 / portTICK_PERIOD_MS);
+        vTaskDelay(100 / portTICK_PERIOD_MS);
     }
 }
 
@@ -167,9 +168,11 @@ void gpio_handler_config_gpios(){
     //gpio_isr_handler_add(GPIO_IN_D36_36, gpio_handler_ISR, (void*) GPIO_IN_D36_36);
     if(USE_GPIO_DI01){
         gpio_isr_handler_add(GPIO_DI01, gpio_handler_ISR, (void*) GPIO_DI01);
+        //gpio_set_intr_type(GPIO_DI01, GPIO_INTR_ANYEDGE);
     }
     if(USE_GPIO_DI02){
         gpio_isr_handler_add(GPIO_DI02, gpio_handler_ISR, (void*) GPIO_DI02);
+        //gpio_set_intr_type(GPIO_DI02, GPIO_INTR_ANYEDGE);
     }
     if(USE_GPIO_DI03){
         gpio_isr_handler_add(GPIO_DI03, gpio_handler_ISR, (void*) GPIO_DI03);
@@ -177,18 +180,23 @@ void gpio_handler_config_gpios(){
     }
     if(USE_GPIO_DI04){
         gpio_isr_handler_add(GPIO_DI04, gpio_handler_ISR, (void*) GPIO_DI04);
+        //gpio_set_intr_type(GPIO_DI04, GPIO_INTR_ANYEDGE);
     }
     if(USE_GPIO_DI05){
         gpio_isr_handler_add(GPIO_DI05, gpio_handler_ISR, (void*) GPIO_DI05);
+        //gpio_set_intr_type(GPIO_DI05, GPIO_INTR_ANYEDGE);
     }
     if(USE_GPIO_DI06){
         gpio_isr_handler_add(GPIO_DI06, gpio_handler_ISR, (void*) GPIO_DI06);
+        //gpio_set_intr_type(GPIO_DI06, GPIO_INTR_ANYEDGE);
     }
     if(USE_GPIO_DI07){
         gpio_isr_handler_add(GPIO_DI07, gpio_handler_ISR, (void*) GPIO_DI07);
+        //gpio_set_intr_type(GPIO_DI07, GPIO_INTR_ANYEDGE);
     }
     if(USE_GPIO_DI08){
         gpio_isr_handler_add(GPIO_DI08, gpio_handler_ISR, (void*) GPIO_DI08);
+        //gpio_set_intr_type(GPIO_DI08, GPIO_INTR_ANYEDGE);
     }
 
 
@@ -228,12 +236,10 @@ static uint64_t gpio_handler_get_input_mask(){
 
 static uint64_t gpio_handler_get_output_mask(){
     uint64_t output = 0;
-    printf("GPIO BEFORE: %llu\n", output);
     output |= 1ULL<<GPIO_DO01;
     output |= 1ULL<<GPIO_DO02;
     output |= 1ULL<<GPIO_DO03;
     output |= 1ULL<<GPIO_DO04;
-    printf("GPIO AFTER: %llu\n", output);
 
     return output;
 }

@@ -31,16 +31,16 @@ void analog_handler_init(){
             adc1_config_channel_atten(AN02, atten);
         }
         if(USE_AN03){
-            adc2_config_channel_atten(AN03, atten);
+            adc1_config_channel_atten(AN03, atten);
         }
         if(USE_AN04){
-            adc2_config_channel_atten(AN04, atten);
+            adc1_config_channel_atten(AN04, atten);
         }
         if(USE_AN05){
-            adc2_config_channel_atten(AN05, atten);
+            adc1_config_channel_atten(AN05, atten);
         }
         if(USE_AN06){
-            adc2_config_channel_atten(AN06, atten);
+            adc1_config_channel_atten(AN06, atten);
         }                                                        
     } 
 
@@ -106,20 +106,16 @@ void analog_handler_task(void * pvParameters){
                 adc_reading_an02 += adc1_get_raw((adc1_channel_t)AN02);
             }
             if(USE_AN03){
-                (void)adc2_get_raw((adc2_channel_t)AN03, ADC_WIDTH_BIT_12, &raw);
-                adc_reading_an03 += raw;
+                adc_reading_an03 += adc1_get_raw((adc1_channel_t)AN03);
             }
             if(USE_AN04){
-                (void)adc2_get_raw((adc2_channel_t)AN04, ADC_WIDTH_BIT_12, &raw);
-                adc_reading_an04 += raw;
+                adc_reading_an04 += adc1_get_raw((adc1_channel_t)AN04);
             }
             if(USE_AN05){
-                (void)adc2_get_raw((adc2_channel_t)AN05, ADC_WIDTH_BIT_12, &raw);
-                adc_reading_an05 += raw;
+                adc_reading_an05 += adc1_get_raw((adc1_channel_t)AN05);
             }
             if(USE_AN06){
-                (void)adc2_get_raw((adc2_channel_t)AN06, ADC_WIDTH_BIT_12, &raw);
-                adc_reading_an06 += raw;
+                adc_reading_an06 += adc1_get_raw((adc1_channel_t)AN06);
             }
         }
 
@@ -129,10 +125,12 @@ void analog_handler_task(void * pvParameters){
         adc_reading_an03 /= NO_OF_SAMPLES;
         adc_reading_an04 /= NO_OF_SAMPLES;
         adc_reading_an05 /= NO_OF_SAMPLES;
+        adc_reading_an06 /= NO_OF_SAMPLES;
 
 
         if(init){
             if(USE_AN01){
+                //printf("AN01: %d\n", adc_reading_an01);
                 if(analog_handler_compare(an01_last_read, adc_reading_an01)){
                     an01_last_read = adc_reading_an01;
                     mqtt_msg.status = an01_last_read;
@@ -191,7 +189,7 @@ void analog_handler_task(void * pvParameters){
             init = true;
         }
 
-        vTaskDelay(500 / portTICK_PERIOD_MS);
+        vTaskDelay(1000 / portTICK_PERIOD_MS);
     }
 }
 
