@@ -99,6 +99,5 @@ int app_main( void ){
         printf("SYSTEM_Init Fail\n");
     }
     
-    
     return 0;
 }

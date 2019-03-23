@@ -5,8 +5,10 @@
 
 #if configTICK_RATE_HZ == 100
     #define RTC_CONFIG_FACTOR 10
+    #define RTC_CONFIG_NORM_FACTOR 100
 #else
     #define RTC_CONFIG_FACTOR 1
+    #define RTC_CONFIG_NORM_FACTOR 1000
 #endif
 
 void rtc_config_init();
