@@ -48,7 +48,7 @@ void rtc_config_set_time(uint32_t in_time){
 
 void rtc_config_set_time_(char * timeString, int len){
     uint32_t time_ = 0;
-    sscanf(timeString, "%d", &time_);
+    sscanf(timeString, "%u", &time_);
     rtc_time = time_;
 }
 

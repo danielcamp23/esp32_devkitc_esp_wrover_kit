@@ -57,57 +57,94 @@ struct freertos_sockaddr xBindAddress;
         to be created. */
     }
 
-    return NULL;
+    return -1;
 }
 
 
 void vStandardSendExample(){
 /* Note - the RTOS task stack must be big enough to hold this array!. */
 
-Socket_t xSocket = createUDPSocket();
-uint8_t ucBuffer[ 128 ] = {'h', 'o', 'l', 'a', '\0'};
+Socket_t xSocket;
+struct freertos_sockaddr xBindAddress;
+
+    /* Create a UDP socket. */
+    xSocket = FreeRTOS_socket( FREERTOS_AF_INET,
+                               FREERTOS_SOCK_DGRAM,
+                               FREERTOS_IPPROTO_UDP );
+
+    if( xSocket != FREERTOS_INVALID_SOCKET )
+    {
+
+        xBindAddress.sin_port = FreeRTOS_htons( 9999 );
+        if( FreeRTOS_bind( xSocket, &xBindAddress, sizeof( &xBindAddress ) ) == 0 )
+        {
+            printf("BIND succesfull\n");
+           
+        }
+        else{
+            printf("BIND FAILED\n");
+        }
+
+    }
+    else
+    {
+        printf("Unable to create socket\n");
+    } 
+uint8_t ucBuffer[ 128 ] = {'h', 'o', 'l', '\n', '\0'};
 struct freertos_sockaddr xDestinationAddress;
 int32_t iReturned;
+    
+    TickType_t xSendTimeout_ms = 20000;
+    xSendTimeout_ms /= portTICK_PERIOD_MS;
+    
 
+    //setsockopt(server, SOL_SOCKET, SO_BROADCAST, &optval, sizeof(optval));
     /* Fill in the destination address and port number, which in this case is
     port 1024 on IP address 192.168.0.100. */
+    //xDestinationAddress.sin_addr = FreeRTOS_inet_addr( "192.168.0.8" );//FreeRTOS_inet_addr_quick( 192, 168, 0, 8 );
     xDestinationAddress.sin_addr = FreeRTOS_inet_addr_quick( 192, 168, 0, 8 );
     xDestinationAddress.sin_port = FreeRTOS_htons( 1024 );
 
+    //setsockopt(server, SOL_SOCKET, SO_BROADCAST, &optval, sizeof(optval));
     /* The local buffer is filled with the data to be sent, in this case it is
     just filled with 0xff. */
     //memset( ucBuffer, 0xff, 128 );
-    stpncpy((char *)ucBuffer, "Hola Probando UDP...", 20);
+    
 
     /* Send the buffer with ulFlags set to 0, so the FREERTOS_ZERO_COPY bit
     is clear. */
-    if(xSocket == NULL){
+    if(xSocket == FREERTOS_INVALID_SOCKET){
         printf("SOCKET NOT CREATED\n");
     }
     else{
         printf("SOCKET CREATED XD\n");
     }
 
-    iReturned = FreeRTOS_sendto(
-                                    /* The socket being send to. */
-                                    xSocket,
-                                    /* The data being sent. */
-                                    ucBuffer,
-                                    /* The length of the data being sent. */
-                                    4,
-                                    /* ulFlags with the FREERTOS_ZERO_COPY bit clear. */
-                                    0,
-                                    /* Where the data is being sent. */
-                                    &xDestinationAddress,
-                                    /* Not used but should be set as shown. */
-                                    sizeof( xDestinationAddress )
-                               );
+    for(int i=0; i<10; ++i){
+        printf("Send %d\n", i);
+        snprintf((char *)ucBuffer, 128, "Hola Probando UDP...%d\n", i);
+        iReturned = FreeRTOS_sendto(
+                                        /* The socket being send to. */
+                                        xSocket,
+                                        /* The data being sent. */
+                                        ucBuffer,
+                                        /* The length of the data being sent. */
+                                        23,
+                                        /* ulFlags with the FREERTOS_ZERO_COPY bit clear. */
+                                        0,
+                                        /* Where the data is being sent. */
+                                        &xDestinationAddress,
+                                        /* Not used but should be set as shown. */
+                                        sizeof( xDestinationAddress )
+                                );
 
-    printf("Returned: %d\n", iReturned);
-    if( iReturned == 128 )
-    {
-        /* The data was successfully queued for sending.  128 bytes will have
-        been copied out of ucBuffer and into a buffer inside the TCP/IP stack.
-        ucBuffer can be re-used now. */
+        printf("Returned: %d\n", iReturned);
+        if( iReturned == 128 )
+        {
+            /* The data was successfully queued for sending.  128 bytes will have
+            been copied out of ucBuffer and into a buffer inside the TCP/IP stack.
+            ucBuffer can be re-used now. */
+        }
+     vTaskDelay(1000 / portTICK_PERIOD_MS);
     }
 }
