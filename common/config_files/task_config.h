@@ -25,6 +25,10 @@
 #define TASK_ANALOG_STACK_SIZE      2000
 #define TASK_ANALOG_PRIORITY        2
 
+#define TASK_NTP_NAME            "NTP"
+#define TASK_NTP_STACK_SIZE      2000
+#define TASK_NTP_PRIORITY        2
+
 
 
 

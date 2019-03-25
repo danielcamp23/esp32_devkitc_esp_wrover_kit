@@ -43,8 +43,8 @@
 #include "rtc_config.h"
 #include "ota_client.h"
 #include "analog_handler.h"
-#include "udp_request.h"
 #include "queue_conf.h"
+#include "ntp.h"
 
 /* Logging Task Defines. */
 #define mainLOGGING_MESSAGE_QUEUE_LENGTH    ( 32 )
@@ -57,7 +57,6 @@ int app_main( void ){
 							mainLOGGING_MESSAGE_QUEUE_LENGTH );
     
     if(SYSTEM_Init() == pdPASS){
-        //printf("SYSTEM_Init OK\n");
         flags_init();
         nvs_storage_init();    
         authentication_init();
@@ -67,14 +66,11 @@ int app_main( void ){
         wifi_config_init();
         //ota_client_init();
         gpio_handler_init();
-        analog_handler_init();
-        udp_req_init();
-
+        //analog_handler_init();
+        ntp_init();
 
         WIFIReturnCode_t xWifiStatus = wifi_config_start_driver();
 
-
-        
         if(xWifiStatus == eWiFiSuccess){
             ( void ) xTaskCreate( wifi_config_task,
                                 TASK_WIFI_NAME,

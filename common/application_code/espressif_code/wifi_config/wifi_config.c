@@ -309,7 +309,6 @@ void wifi_config_task(void * pvParameters){
                 connecting = false; 
                 configPRINTF( ( "WiFi connected!\r\n") );
                 flags_set_wifi_connected();
-                vStandardSendExample();
             }
             else{
                 configPRINTF( ( "Unable to CONNECT...\r\n" ) );

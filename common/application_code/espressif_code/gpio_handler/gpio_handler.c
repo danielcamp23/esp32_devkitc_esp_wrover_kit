@@ -41,7 +41,7 @@ void gpio_handler_init(){
 
 static void IRAM_ATTR gpio_handler_ISR(void* arg){
     uint32_t gpio_num = (uint32_t) arg;
-    //printf("status: %d - %d\n", gpio_num, gpio_handler_read(gpio_num));    
+    //printf("status: %d - \n", gpio_num);    
     xQueueSendFromISR(gpio_evt_queue, &gpio_num, NULL);
 }
 
@@ -79,14 +79,11 @@ void gpio_handler_read_task(void * pvParameters){
     for(;;){
         while(xQueueReceiveFromISR(gpio_evt_queue, &gpio, NULL)){
             prev_status = gpio_handler_read(gpio);
-            interrupt_time = rtc_config_get_time();
-            report_change = true;
-            //printf("status: %d\n", prev_status);    
-            //printf("GPIO: %d -- %d\n", gpio, prev_status);
-
+            interrupt_time = rtc_config_get_ticks_MS();
+            report_change = true;        
         }
 
-        if( report_change &&  (rtc_config_get_time() - interrupt_time > 50) ){
+        if( report_change &&  (rtc_config_get_ticks_MS() - interrupt_time > 50) ){
             curr_status = gpio_handler_read(gpio);
             report_change = false;
             if(prev_status == curr_status){

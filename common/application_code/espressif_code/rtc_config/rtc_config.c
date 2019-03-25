@@ -36,6 +36,11 @@ uint32_t rtc_config_get_time(){
     return t;
 }
 
+uint32_t rtc_config_get_ticks_MS(){
+    return xTaskGetTickCount() * RTC_CONFIG_FACTOR;
+}
+
+
 void rtc_config_set_time(uint32_t in_time){
     if(xSemaphoreTake(rtc_mutex, rtc_max_block_time) == pdPASS){
         rtc_offset = xTaskGetTickCount();
