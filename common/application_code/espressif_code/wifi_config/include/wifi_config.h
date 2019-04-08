@@ -1,7 +1,7 @@
 #ifndef _WIFI_CONFIG_STATIC_H_
 #define _WIFI_CONFIG_STATIC_H_
 
-#include "aws_wifi.h"
+#include "acua_wifi.h"
 
 void wifi_config_init();
 

@@ -53,6 +53,13 @@ void flags_set_wifi_connected(){
     _flags_give_mutex();
 }
 
+void flags_reset_wifi_connected(){
+    if(_flags_take_mutex()){
+        CONTROL_FLAGS.wifi_connected = 0;
+    }
+    _flags_give_mutex();
+}
+
 bool flags_is_mqtt_connected(){
     bool ret = false;
     if(_flags_take_mutex()){

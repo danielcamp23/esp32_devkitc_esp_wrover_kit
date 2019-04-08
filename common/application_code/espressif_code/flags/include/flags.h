@@ -56,10 +56,13 @@ Setea flag de WiFi inicializado
 void flags_set_wifi_connected();
 
 /*
-Revisa si el cliente MQTT está conectado al broker
+Resetea flag de WiFi inicializado
 @Params:
-@Return: true si cliente conectado, false de lo contrario
+@Return: 
 */
+void flags_reset_wifi_connected();
+
+
 bool flags_is_mqtt_connected();
 
 /*

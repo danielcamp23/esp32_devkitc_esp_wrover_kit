@@ -114,7 +114,7 @@ static BaseType_t mqtt_config_connect_to_broker( void )
         0,                                    /* The length of the client Id, filled in later as not const. */
         pdFALSE,                              /* Deprecated. */
         NULL,                                 /* User data supplied to the callback. Can be NULL. */
-        NULL,                                 /* Callback used to report various events. Can be NULL. */
+        mqtt_events_callback,                 /* Callback used to report various events. Can be NULL. */
         NULL,                                 /* Certificate used for secure connection. Can be NULL. */
         0                                     /* Size of certificate used for secure connection. */
     };
@@ -279,3 +279,57 @@ static MQTTBool_t mqtt_config_subs_callback(void * pvUserData, const MQTTPublish
 MQTTAgentHandle_t mqtt_config_get_handler(){
     return xMQTTHandle;
 }
+
+static BaseType_t mqtt_events_callback (void * pvUserData, const MQTTAgentCallbackParams_t * const pxCallbackParams){
+    MQTTAgentEvent_t xMQTTEvent = pxCallbackParams->xMQTTEvent;
+    switch(xMQTTEvent){
+        case eMQTTAgentPublish:
+            printf("eMQTTAgentPublish\n");
+            break;
+        case eMQTTAgentDisconnect:
+            printf("eMQTTAgentDisconnect\n");
+            break;
+    }
+    return pdTRUE;
+}
+
+/*
+
+Callback
+You can specify an optional callback that is invoked whenever the MQTT agent is disconnected from the broker or whenever 
+a publish message is received from the broker. The received publish message is stored in a buffer taken from the 
+central buffer pool. This message is passed to the callback. This callback runs in the context of the MQTT task and 
+therefore must be quick. If you need to do longer processing, you must take the ownership of the buffer by returning 
+pdTRUE from the callback. You must then return the buffer back to the pool whenever you are done by calling 
+FreeRTOS_Agent_ReturnBuffer.
+
+typedef enum
+{
+    eMQTTAgentPublish,   //< A Publish message was received from the broker. 
+    eMQTTAgentDisconnect //< The connection to the broker got disconnected. 
+} MQTTAgentEvent_t;
+*/
+
+
+/**
+ * @brief Signature of the callback registered by the user to get notified of various events.
+ *
+ * The user can register an optional callback to get notified of various events.
+ *
+ * @param[in] pvUserData The user data as provided in the connect parameters while connecting.
+ * @param[in] pxCallbackParams The event and related data.
+ *
+ * @return The return value is ignored in all other cases except publish (i.e. eMQTTAgentPublish
+ * event):
+ * 1. If pdTRUE is returned - The ownership of the buffer passed in the callback (xBuffer
+ * in MQTTPublishData_t) lies with the user.
+ * 2. If pdFALSE is returned - The ownership of the buffer passed in the callback (xBuffer
+ * in MQTTPublishData_t) remains with the library and it is recycled as soon as
+ * the callback returns.<br>
+ * The user should take the ownership of the buffer containing the received message from the
+ * broker by returning pdTRUE from the callback if the user wants to use the buffer after
+ * the callback is over. The user should return the buffer whenever done by calling the
+ * MQTT_AGENT_ReturnBuffer API.
+ *
+ * @see MQTTAgentCallbackParams_t.
+ */

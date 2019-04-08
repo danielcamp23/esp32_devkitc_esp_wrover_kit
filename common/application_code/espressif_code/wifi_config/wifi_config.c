@@ -4,6 +4,7 @@
 #include "wifi_info.h"
 #include "flags.h"
 #include "udp_request.h"
+#include "queue_conf.h"
 /* FreeRTOS includes. */
 #include "FreeRTOS.h"
 #include "task.h"
@@ -11,7 +12,7 @@
 /* AWS System includes. */
 #include "aws_system_init.h"
 #include "aws_logging_task.h"
-#include "aws_wifi.h"
+#include "acua_wifi.h"
 //#include "aws_clientcredential.h"
 #include "FreeRTOS_IP.h"
 #include "FreeRTOS_Sockets.h"
@@ -22,6 +23,9 @@
 
 /* Application version info. */
 #include "aws_application_version.h"
+
+
+QueueHandle_t wifi_queue; 
 
 
 /* Declare the firmware version structure for all to see. */
@@ -290,6 +294,7 @@ void wifi_config_task(void * pvParameters){
     int ctr_connect = 0;
     bool connected = false;
     bool connecting = false;
+    struct WIFIMsg wifi_msg;
     
     ( void ) pvParameters;
 
@@ -299,16 +304,14 @@ void wifi_config_task(void * pvParameters){
     xNetworkParams.ucPasswordLength = sizeof( WIFI_PASSWORD );
     xNetworkParams.xSecurity = WIFI_SECURITY;
 
-    for(;;){
+    for(;;){   
+
         if(!connected && !connecting){
             ctr_connect = 0;
             printf("connecting to: %s - %s\n", WIFI_SSID, WIFI_PASSWORD);
             xWifiStatus = WIFI_ConnectAP( &( xNetworkParams ) );
-            if( xWifiStatus == eWiFiSuccess ){
-                connected = true;
-                connecting = false; 
+            if( xWifiStatus == eWiFiSuccess ){ 
                 configPRINTF( ( "WiFi connected!\r\n") );
-                flags_set_wifi_connected();
             }
             else{
                 configPRINTF( ( "Unable to CONNECT...\r\n" ) );
@@ -317,17 +320,42 @@ void wifi_config_task(void * pvParameters){
             }
         }
 
-        else if(connecting){
-            ctr_connect++;
-            configPRINTF(("connecting to %s\n", WIFI_SSID));
-        }
-
-        if(connecting && !connected && ctr_connect>10){
+        if(connecting && !connected && ctr_connect++>10){
             connecting = false;
             connected = false;
         }
 
-        //TODO: poner lógica para detectar cuando el ESP se desconecta de la red
-        vTaskDelay(1000 / portTICK_PERIOD_MS);
+        while(xQueueReceive(wifi_queue, &wifi_msg, NULL) != errQUEUE_EMPTY){
+            switch(wifi_msg.status){
+                case SYSTEM_EVENT_STA_START:
+                    printf("SYSTEM_EVENT_STA_START\n");                        
+                    break;
+                case SYSTEM_EVENT_STA_CONNECTED:
+                    printf("SYSTEM_EVENT_STA_CONNECTED\n");               
+                    connected = true;
+                    connecting = false;                       
+                    break;
+                case SYSTEM_EVENT_STA_GOT_IP:
+                    printf("SYSTEM_EVENT_STA_GOT_IP\n");
+                    connected = true;
+                    connecting = false;                  
+                    flags_set_wifi_connected();
+                    break;
+                case SYSTEM_EVENT_STA_DISCONNECTED:
+                    printf("SYSTEM_EVENT_STA_DISCONNECTED\n");                
+                    connected = false;
+                    connecting = false;
+                    flags_reset_wifi_connected();
+                    break;
+                default:
+                    break;
+                }
+        }
+
+
+        vTaskDelay(2000 / portTICK_PERIOD_MS);
     }
 }
+
+
+

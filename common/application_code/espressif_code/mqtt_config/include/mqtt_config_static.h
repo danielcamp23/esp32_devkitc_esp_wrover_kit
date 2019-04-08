@@ -13,4 +13,7 @@ static BaseType_t mqtt_config_subcribe(void);
  */
 static MQTTBool_t mqtt_config_subs_callback(void * pvUserData, const MQTTPublishData_t * const pxCallbackParams);
 
+static BaseType_t mqtt_events_callback (void * pvUserData, const MQTTAgentCallbackParams_t * const pxCallbackParams);
+
+
 #endif
