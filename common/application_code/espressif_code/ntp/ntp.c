@@ -51,7 +51,8 @@ bool ntp_get_date(){
         tmp |= packetBuffer[41] << 16;
         tmp |= packetBuffer[42] << 8;
         tmp |= packetBuffer[43] << 0;
-        tmp = tmp - NTP_1970_TIMESTAMP + NTP_RELATIVE_GMT_BOG;
+        //tmp = tmp - NTP_1970_TIMESTAMP + NTP_RELATIVE_GMT_BOG;
+        tmp = tmp - NTP_1970_TIMESTAMP;
         udp_close_socket(socket);
         printf("captured timestamp: %u\n", tmp);
         rtc_config_set_time(tmp);

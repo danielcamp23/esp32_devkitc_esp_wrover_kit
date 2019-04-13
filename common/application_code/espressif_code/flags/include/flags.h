@@ -72,6 +72,13 @@ Setea flag de cliente MQTT conectado
 */
 void flags_set_mqtt_connected();
 
+/*
+Resetea flag de MQTT
+@Params:
+@Return: 
+*/
+void flags_reset_mqtt_connected();
+
 
 
 #endif

@@ -55,15 +55,41 @@ void mqtt_config_task(void * pvParameters){
     }
 
     /* Create the MQTT client object and connect it to the MQTT broker. */
-    xReturned = mqtt_config_connect_to_broker();
+    xReturned = mqtt_config_create();
 
-
-    if( xReturned == pdPASS ){
-        flags_set_mqtt_connected();
-        configPRINTF( ( "MQTT echo test echoing task created.\r\n" ) );
-        xReturned = mqtt_config_subcribe();
+    if(xReturned != eMQTTAgentSuccess){
+        goto end_task;
     }
+
+    xReturned = mqtt_config_connect();
+
+    if(xReturned != eMQTTAgentSuccess){
+        mqtt_config_delete();
+        goto end_task;
+    }
+
+
+    flags_set_mqtt_connected();
+    xReturned = mqtt_config_subcribe();
+
     for(;;){
+
+        if( !flags_is_mqtt_connected() ){
+            printf("MQTT disconnected\n");
+            vTaskDelay(5000 / portTICK_PERIOD_MS);
+            xReturned = mqtt_config_connect();
+            if(xReturned != eMQTTAgentSuccess){
+                goto br;
+            }
+
+            xReturned = mqtt_config_subcribe();
+            if(xReturned != eMQTTAgentSuccess){
+                mqtt_config_disconnect();
+                goto br;
+            }
+
+        }
+    br:
         if(xQueueReceive(mqtt_queue, &mqtt_msg, 0 )){//Lee si hay items en la cola
             mqtt_config_report_status(mqtt_msg);
         } 
@@ -72,6 +98,7 @@ void mqtt_config_task(void * pvParameters){
     }
 
 
+end_task:
     /* Disconnect the client. */
     ( void ) MQTT_AGENT_Disconnect( xMQTTHandle, MQTT_TIMEOUT );
 
@@ -100,8 +127,7 @@ void mqtt_config_report_status(struct MqttMsg mqtt_msg){
 
 }
 
-static BaseType_t mqtt_config_connect_to_broker( void )
-{
+static MQTTAgentReturnCode_t mqtt_config_create( void ){
     MQTTAgentReturnCode_t xReturned;
     BaseType_t xReturn = pdFAIL;
     MQTTAgentConnectParams_t xConnectParameters =
@@ -127,37 +153,66 @@ static BaseType_t mqtt_config_connect_to_broker( void )
      * is set by mqttconfigMAX_BROKERS. */
     xReturned = MQTT_AGENT_Create( &xMQTTHandle );
 
-    if( xReturned == eMQTTAgentSuccess )
+    return xReturned;
+}
+
+static MQTTAgentReturnCode_t mqtt_config_connect(){
+    MQTTAgentReturnCode_t xReturned;
+
+    MQTTAgentConnectParams_t xConnectParameters =
     {
-        /* Fill in the MQTTAgentConnectParams_t member that is not const,
-         * and therefore could not be set in the initializer (where
-         * xConnectParameters is declared in this function). */
-        xConnectParameters.usClientIdLength = ( uint16_t ) strlen( ( const char * ) MQTT_CLIENT_ID );
+        MQTT_BROKER_ENDPOINT, /* The URL of the MQTT broker to connect to. */
+        MQTT_AGENT_CONNECT_FLAGS,             /* Connection flags. */
+        pdFALSE,                              /* Deprecated. */
+        MQTT_BROKER_PORT,                     /* Port number on which the MQTT broker is listening. Can be overridden by ALPN connection flag. */
+        MQTT_CLIENT_ID,                       /* Client Identifier of the MQTT client. It should be unique per broker. */
+        0,                                    /* The length of the client Id, filled in later as not const. */
+        pdFALSE,                              /* Deprecated. */
+        NULL,                                 /* User data supplied to the callback. Can be NULL. */
+        mqtt_events_callback,                 /* Callback used to report various events. Can be NULL. */
+        NULL,                                 /* Certificate used for secure connection. Can be NULL. */
+        0                                     /* Size of certificate used for secure connection. */
+    };
 
-        /* Connect to the broker. */
-        configPRINTF( ( "MQTT echo attempting to connect to %s.\r\n", MQTT_BROKER_ENDPOINT ) );
-        xReturned = MQTT_AGENT_Connect( xMQTTHandle,
-                                        &xConnectParameters,
-                                        MQTT_ECHO_TLS_NEGOTIATION_TIMEOUT );
+    configPRINTF( ( "MQTT echo attempting to connect to %s.\r\n", MQTT_BROKER_ENDPOINT ) );
 
-        if( xReturned != eMQTTAgentSuccess )
-        {
-            /* Could not connect, so delete the MQTT client. */
-            ( void ) MQTT_AGENT_Delete( xMQTTHandle );
-            configPRINTF( ( "ERROR:  MQTT echo failed to connect with error %d.\r\n", xReturned ) );
-        }
-        else
-        {
-            configPRINTF( ( "MQTT echo connected.\r\n" ) );
-            xReturn = pdPASS;
-        }
+    /* Fill in the MQTTAgentConnectParams_t member that is not const,
+    * and therefore could not be set in the initializer (where
+    * xConnectParameters is declared in this function). */
+    
+    xConnectParameters.usClientIdLength = ( uint16_t ) strlen( ( const char * ) MQTT_CLIENT_ID );
+
+    xReturned = MQTT_AGENT_Connect( xMQTTHandle,
+                                    &xConnectParameters,
+                                    MQTT_ECHO_TLS_NEGOTIATION_TIMEOUT );
+    
+
+    if(xReturned == eMQTTAgentSuccess){
+        flags_set_mqtt_connected();
+        printf("MQTT connected\n");
     }
+    else{
+        printf("MQTT could not connect\n");
+    }
+    return xReturned;
+}
 
-    return xReturn;
+static void mqtt_config_delete(){
+    (void)MQTT_AGENT_Delete( xMQTTHandle );
+    flags_reset_mqtt_connected();
+}
+
+static void mqtt_config_disconnect(){
+    (void) MQTT_AGENT_Disconnect( xMQTTHandle, MQTT_TIMEOUT );
+    flags_reset_mqtt_connected();
 }
 
 
 static BaseType_t mqtt_config_subcribe(void){
+
+    if(!flags_is_mqtt_connected()){
+        return -1;
+    }
     MQTTAgentReturnCode_t xReturned;
     BaseType_t xReturn;
     MQTTAgentSubscribeParams_t xSubscribeParams;
@@ -185,7 +240,7 @@ static BaseType_t mqtt_config_subcribe(void){
         xReturn = pdFAIL;
     }
 
-    return xReturn;
+    return xReturned;
 }
 
 static MQTTBool_t mqtt_config_subs_callback(void * pvUserData, const MQTTPublishData_t * const pxCallbackParams){
@@ -287,6 +342,7 @@ static BaseType_t mqtt_events_callback (void * pvUserData, const MQTTAgentCallba
             printf("eMQTTAgentPublish\n");
             break;
         case eMQTTAgentDisconnect:
+            flags_reset_mqtt_connected();
             printf("eMQTTAgentDisconnect\n");
             break;
     }

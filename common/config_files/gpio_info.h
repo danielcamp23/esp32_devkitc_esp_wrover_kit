@@ -1,10 +1,10 @@
 #ifndef _GPIO_INFO_H_
 #define _GPIO_INFO_H_
 
-#define GPIO_DI01      12   /* GPIO12 */
-#define GPIO_DI02      14   /* GPIO14 */
-#define GPIO_DI03      27   /* GPIO27 */
-#define GPIO_DI04      26   /* GPIO26 */
+#define GPIO_DI01      14   /* GPIO12 */
+#define GPIO_DI02      27   /* GPIO14 */
+#define GPIO_DI03      26   /* GPIO27 */
+#define GPIO_DI04      25   /* GPIO26 */
 #define GPIO_DI05      18   /* GPIO18 */
 #define GPIO_DI06      19   /* GPIO19 */
 #define GPIO_DI07      22   /* GPIO22 */

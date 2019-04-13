@@ -15,5 +15,14 @@ static MQTTBool_t mqtt_config_subs_callback(void * pvUserData, const MQTTPublish
 
 static BaseType_t mqtt_events_callback (void * pvUserData, const MQTTAgentCallbackParams_t * const pxCallbackParams);
 
+static MQTTAgentReturnCode_t mqtt_config_connect();
+
+static MQTTAgentReturnCode_t mqtt_config_create( void );
+
+static void mqtt_config_delete();
+
+static void mqtt_config_disconnect();
+
+
 
 #endif
