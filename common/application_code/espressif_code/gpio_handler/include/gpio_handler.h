@@ -6,6 +6,23 @@
 #include "freertos/FreeRTOS.h"
 #include "freertos/queue.h"
 
+
+typedef unsigned int boolean_t;
+
+typedef union {
+    struct{
+        boolean_t DI01 :    1;
+        boolean_t DI02 :    1;
+        boolean_t DI03 :    1;
+        boolean_t DI04 :    1;
+        boolean_t DI05 :    1;
+        boolean_t DI06 :    1;
+        boolean_t DI07 :    1;
+        boolean_t DI08 :    1;     
+    };
+    int raw_DI;
+} Gpios_t;
+
 void gpio_handler_init();
 
 void gpio_handler_read_task(void * pvParameters);

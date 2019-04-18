@@ -24,4 +24,11 @@ Devuelve la mascara bits de las salidas segun se hayan definido en gpio_info.h
 */
 static uint64_t gpio_handler_get_output_mask();
 
+/*
+Para un gpio (entrada) compara el estado actual con el que se ha reportado anteriormente
+@Params: - gpio: entrada a comparar
+@Return: - true si hay un cambio entre las dos muestras, false en otro caso
+*/
+static bool gpio_handler_compare_status(unsigned int gpio);
+
 #endif

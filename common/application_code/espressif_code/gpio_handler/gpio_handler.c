@@ -18,7 +18,12 @@ static QueueHandle_t gpio_evt_queue;
 QueueHandle_t gpio_queue;
 
 
+static Gpios_t DI_status;
+static Gpios_t DI_reported;
+
 void gpio_handler_init(){
+    DI_status.raw_DI = 0;
+    DI_reported.raw_DI =  0;
     gpio_handler_config_gpios();
     gpio_evt_queue = xQueueCreate(15, sizeof(uint32_t));
     if(gpio_evt_queue != NULL){
@@ -80,50 +85,121 @@ void gpio_handler_read_task(void * pvParameters){
         while(xQueueReceiveFromISR(gpio_evt_queue, &gpio, NULL)){
             prev_status = gpio_handler_read(gpio);
             interrupt_time = rtc_config_get_ticks_MS();
-            report_change = true;        
-        }
-
-        if( report_change &&  (rtc_config_get_ticks_MS() - interrupt_time > 50) ){
-            curr_status = gpio_handler_read(gpio);
-            report_change = false;
-            if(prev_status == curr_status){
-                mqtt_msg.gpio = gpio;
-                mqtt_msg.status = curr_status;
-
-                //printf("status: %d\n", prev_status);    
-                //printf("GPIO: %d -- %d\n", gpio, prev_status);
-                switch(gpio){
+            report_change = true;
+            switch(gpio){
                     case GPIO_DI01:
-                        snprintf(mqtt_msg.name, 10, "%s", DI01_NAME);
+                        DI_status.DI01 = prev_status;
                         break;
                     case GPIO_DI02:
-                        snprintf(mqtt_msg.name, 10, "%s", DI02_NAME);
+                        DI_status.DI02 = prev_status;
                         break;
                     case GPIO_DI03:
-                        snprintf(mqtt_msg.name, 10, "%s", DI03_NAME);
+                        DI_status.DI03 = prev_status;
                         break;
                     case GPIO_DI04:
-                        snprintf(mqtt_msg.name, 10, "%s", DI04_NAME);
+                        DI_status.DI04 = prev_status;
                         break;
                     case GPIO_DI05:
-                        snprintf(mqtt_msg.name, 10, "%s", DI05_NAME);
+                        DI_status.DI05 = prev_status;
                         break;
                     case GPIO_DI06:
-                        snprintf(mqtt_msg.name, 10, "%s", DI06_NAME);
+                        DI_status.DI06 = prev_status;
                         break;
                     case GPIO_DI07:
-                        snprintf(mqtt_msg.name, 10, "%s", DI07_NAME);
+                        DI_status.DI07 = prev_status;
                         break;
                     case GPIO_DI08:
-                        snprintf(mqtt_msg.name, 10, "%s", DI08_NAME);
+                        DI_status.DI08 = prev_status;
                         break;                                                                                                                                                                        
-                }
+                }   
+            }
 
+        if( report_change &&  (rtc_config_get_ticks_MS() - interrupt_time > 50) ){
+            report_change = false;
+
+            if(gpio_handler_compare_status(GPIO_DI01)){
+                DI_reported.DI01 = DI_status.DI01;
+                snprintf(mqtt_msg.name, 10, "%s", DI01_NAME);
                 queue_conf_send_mqtt(mqtt_msg);
             }
+            
+            if(gpio_handler_compare_status(GPIO_DI02)){
+                DI_reported.DI02 = DI_status.DI02;
+                snprintf(mqtt_msg.name, 10, "%s", DI02_NAME);
+                queue_conf_send_mqtt(mqtt_msg);
+            }
+
+            if(gpio_handler_compare_status(GPIO_DI03)){
+                DI_reported.DI03 = DI_status.DI03;
+                snprintf(mqtt_msg.name, 10, "%s", DI03_NAME);
+                queue_conf_send_mqtt(mqtt_msg);
+            }
+
+            if(gpio_handler_compare_status(GPIO_DI04)){
+                DI_reported.DI04 = DI_status.DI04;
+                snprintf(mqtt_msg.name, 10, "%s", DI04_NAME);
+                queue_conf_send_mqtt(mqtt_msg);
+            }
+
+            if(gpio_handler_compare_status(GPIO_DI05)){
+                DI_reported.DI05 = DI_status.DI05;
+                snprintf(mqtt_msg.name, 10, "%s", DI05_NAME);
+                queue_conf_send_mqtt(mqtt_msg);
+            }
+
+            if(gpio_handler_compare_status(GPIO_DI06)){
+                DI_reported.DI06 = DI_status.DI06;
+                snprintf(mqtt_msg.name, 10, "%s", DI06_NAME);
+                queue_conf_send_mqtt(mqtt_msg);
+            }
+
+            if(gpio_handler_compare_status(GPIO_DI07)){
+                DI_reported.DI07 = DI_status.DI07;
+                snprintf(mqtt_msg.name, 10, "%s", DI07_NAME);
+                queue_conf_send_mqtt(mqtt_msg);
+            }
+
+            if(gpio_handler_compare_status(GPIO_DI08)){
+                DI_reported.DI08 = DI_status.DI08;
+                snprintf(mqtt_msg.name, 10, "%s", DI08_NAME);
+                queue_conf_send_mqtt(mqtt_msg);
+            }
+
         }
 
         vTaskDelay(100 / portTICK_PERIOD_MS);
+    }
+}
+
+static bool gpio_handler_compare_status(unsigned int gpio){
+    switch(gpio){
+        case GPIO_DI01:
+            return DI_status.DI01 == gpio_handler_read(gpio) && DI_status.DI01 != DI_reported.DI01;
+            break;
+        case GPIO_DI02:
+            return DI_status.DI02 == gpio_handler_read(gpio) && DI_status.DI02 != DI_reported.DI02;
+            break;
+        case GPIO_DI03:
+            return DI_status.DI03 == gpio_handler_read(gpio) && DI_status.DI03 != DI_reported.DI03;
+            break;
+        case GPIO_DI04:
+            return DI_status.DI04 == gpio_handler_read(gpio) && DI_status.DI04 != DI_reported.DI04;
+            break;
+        case GPIO_DI05:
+            return DI_status.DI05 == gpio_handler_read(gpio) && DI_status.DI05 != DI_reported.DI05;
+            break;
+        case GPIO_DI06:
+            return DI_status.DI06 == gpio_handler_read(gpio) && DI_status.DI06 != DI_reported.DI06;
+            break;
+        case GPIO_DI07:
+            return DI_status.DI07 == gpio_handler_read(gpio) && DI_status.DI07 != DI_reported.DI07;
+            break;
+        case GPIO_DI08:
+            return DI_status.DI08 == gpio_handler_read(gpio) && DI_status.DI08 != DI_reported.DI08;
+            break; 
+        default:
+            return false;
+            break;     
     }
 }
 
