@@ -120,48 +120,56 @@ void gpio_handler_read_task(void * pvParameters){
             if(gpio_handler_compare_status(GPIO_DI01)){
                 DI_reported.DI01 = DI_status.DI01;
                 snprintf(mqtt_msg.name, 10, "%s", DI01_NAME);
+                mqtt_msg.status = DI_reported.DI01;
                 queue_conf_send_mqtt(mqtt_msg);
             }
             
             if(gpio_handler_compare_status(GPIO_DI02)){
                 DI_reported.DI02 = DI_status.DI02;
                 snprintf(mqtt_msg.name, 10, "%s", DI02_NAME);
+                mqtt_msg.status = DI_reported.DI02;
                 queue_conf_send_mqtt(mqtt_msg);
             }
 
             if(gpio_handler_compare_status(GPIO_DI03)){
                 DI_reported.DI03 = DI_status.DI03;
                 snprintf(mqtt_msg.name, 10, "%s", DI03_NAME);
+                mqtt_msg.status = DI_reported.DI03;
                 queue_conf_send_mqtt(mqtt_msg);
             }
 
             if(gpio_handler_compare_status(GPIO_DI04)){
                 DI_reported.DI04 = DI_status.DI04;
                 snprintf(mqtt_msg.name, 10, "%s", DI04_NAME);
+                mqtt_msg.status = DI_reported.DI04;
                 queue_conf_send_mqtt(mqtt_msg);
             }
 
             if(gpio_handler_compare_status(GPIO_DI05)){
                 DI_reported.DI05 = DI_status.DI05;
                 snprintf(mqtt_msg.name, 10, "%s", DI05_NAME);
+                mqtt_msg.status = DI_reported.DI05;
                 queue_conf_send_mqtt(mqtt_msg);
             }
 
             if(gpio_handler_compare_status(GPIO_DI06)){
                 DI_reported.DI06 = DI_status.DI06;
                 snprintf(mqtt_msg.name, 10, "%s", DI06_NAME);
+                mqtt_msg.status = DI_reported.DI06;
                 queue_conf_send_mqtt(mqtt_msg);
             }
 
             if(gpio_handler_compare_status(GPIO_DI07)){
                 DI_reported.DI07 = DI_status.DI07;
                 snprintf(mqtt_msg.name, 10, "%s", DI07_NAME);
+                mqtt_msg.status = DI_reported.DI07;
                 queue_conf_send_mqtt(mqtt_msg);
             }
 
             if(gpio_handler_compare_status(GPIO_DI08)){
                 DI_reported.DI08 = DI_status.DI08;
                 snprintf(mqtt_msg.name, 10, "%s", DI08_NAME);
+                mqtt_msg.status = DI_reported.DI08;
                 queue_conf_send_mqtt(mqtt_msg);
             }
 
