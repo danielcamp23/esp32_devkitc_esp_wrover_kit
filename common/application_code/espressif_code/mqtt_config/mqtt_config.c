@@ -94,7 +94,7 @@ void mqtt_config_task(void * pvParameters){
             mqtt_config_report_status(mqtt_msg);
         } 
         //mqtt_config_report_status(mqtt_msg);
-        vTaskDelay(500 / portTICK_PERIOD_MS);
+        vTaskDelay(50 / portTICK_PERIOD_MS);
     }
 
 
@@ -115,7 +115,7 @@ void mqtt_config_report_status(struct MqttMsg mqtt_msg){
     MQTTAgentPublishParams_t xPublishParameters;
     char cDataBuffer[ MQTT_MAX_DATA_LENGTH ];
 
-    (void)snprintf( cDataBuffer, MQTT_MAX_DATA_LENGTH, "{\"parameter\": \"%s\", \"value\": %d, \"date\": %u, \"connection\":true}", mqtt_msg.name, mqtt_msg.status , rtc_config_get_time());
+    (void)snprintf( cDataBuffer, MQTT_MAX_DATA_LENGTH, "{\"parameter\": \"%s\", \"value\": %d, \"date\": %u, \"connection\":true}", mqtt_msg.name, mqtt_msg.status , mqtt_msg.timestamp);
     printf("%s\n", cDataBuffer);
     memset(&(xPublishParameters), 0x00, sizeof(xPublishParameters));
     xPublishParameters.pucTopic = MQTT_PUBLISH_TOPIC;

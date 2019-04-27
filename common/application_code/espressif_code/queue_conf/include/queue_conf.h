@@ -14,6 +14,7 @@ struct MqttMsg {
     uint32_t gpio;
     uint32_t status;
     char name[10];
+    uint32_t timestamp;
 };
 
 struct GPIOMsg {

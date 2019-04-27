@@ -140,6 +140,7 @@ void gpio_handler_read_task(void * pvParameters){
                 DI_reported.DI01 = DI_status.DI01;
                 snprintf(mqtt_msg.name, 10, "%s", DI01_NAME);
                 mqtt_msg.status = DI_reported.DI01;
+                mqtt_msg.timestamp = rtc_config_get_time();                
                 queue_conf_send_mqtt(mqtt_msg);
             }
             
@@ -147,6 +148,7 @@ void gpio_handler_read_task(void * pvParameters){
                 DI_reported.DI02 = DI_status.DI02;
                 snprintf(mqtt_msg.name, 10, "%s", DI02_NAME);
                 mqtt_msg.status = DI_reported.DI02;
+                mqtt_msg.timestamp = rtc_config_get_time();                
                 queue_conf_send_mqtt(mqtt_msg);
             }
 
@@ -154,6 +156,7 @@ void gpio_handler_read_task(void * pvParameters){
                 DI_reported.DI03 = DI_status.DI03;
                 snprintf(mqtt_msg.name, 10, "%s", DI03_NAME);
                 mqtt_msg.status = DI_reported.DI03;
+                mqtt_msg.timestamp = rtc_config_get_time();                
                 queue_conf_send_mqtt(mqtt_msg);
             }
 
@@ -161,6 +164,7 @@ void gpio_handler_read_task(void * pvParameters){
                 DI_reported.DI04 = DI_status.DI04;
                 snprintf(mqtt_msg.name, 10, "%s", DI04_NAME);
                 mqtt_msg.status = DI_reported.DI04;
+                mqtt_msg.timestamp = rtc_config_get_time();                
                 queue_conf_send_mqtt(mqtt_msg);
             }
 
@@ -168,6 +172,7 @@ void gpio_handler_read_task(void * pvParameters){
                 DI_reported.DI05 = DI_status.DI05;
                 snprintf(mqtt_msg.name, 10, "%s", DI05_NAME);
                 mqtt_msg.status = DI_reported.DI05;
+                mqtt_msg.timestamp = rtc_config_get_time();                
                 queue_conf_send_mqtt(mqtt_msg);
             }
 
@@ -175,6 +180,7 @@ void gpio_handler_read_task(void * pvParameters){
                 DI_reported.DI06 = DI_status.DI06;
                 snprintf(mqtt_msg.name, 10, "%s", DI06_NAME);
                 mqtt_msg.status = DI_reported.DI06;
+                mqtt_msg.timestamp = rtc_config_get_time();                
                 queue_conf_send_mqtt(mqtt_msg);
             }
 
@@ -182,6 +188,7 @@ void gpio_handler_read_task(void * pvParameters){
                 DI_reported.DI07 = DI_status.DI07;
                 snprintf(mqtt_msg.name, 10, "%s", DI07_NAME);
                 mqtt_msg.status = DI_reported.DI07;
+                mqtt_msg.timestamp = rtc_config_get_time();                
                 queue_conf_send_mqtt(mqtt_msg);
             }
 
@@ -189,6 +196,7 @@ void gpio_handler_read_task(void * pvParameters){
                 DI_reported.DI08 = DI_status.DI08;
                 snprintf(mqtt_msg.name, 10, "%s", DI08_NAME);
                 mqtt_msg.status = DI_reported.DI08;
+                mqtt_msg.timestamp = rtc_config_get_time();                
                 queue_conf_send_mqtt(mqtt_msg);
             }
 
