@@ -21,6 +21,12 @@ QueueHandle_t gpio_queue;
 static Gpios_t DI_status;
 static Gpios_t DI_reported;
 
+
+static uint32_t last_gpio = 0;
+static uint32_t last_status = 0;
+static uint32_t curr_gpio = 0;
+static uint32_t curr_status = 0;
+
 void gpio_handler_init(){
     DI_status.raw_DI = 0;
     DI_reported.raw_DI =  0;
@@ -45,9 +51,14 @@ void gpio_handler_init(){
 
 
 static void IRAM_ATTR gpio_handler_ISR(void* arg){
-    uint32_t gpio_num = (uint32_t) arg;
-    //printf("status: %d - \n", gpio_num);    
-    xQueueSendFromISR(gpio_evt_queue, &gpio_num, NULL);
+    curr_gpio = (uint32_t) arg;
+    curr_status = (uint32_t)  gpio_handler_read(curr_gpio);
+    if(curr_gpio != last_gpio || (curr_gpio == last_gpio && curr_status != last_status)){
+        xQueueSendFromISR(gpio_evt_queue, &curr_gpio, NULL);
+    }
+
+    last_gpio = curr_gpio;
+    last_status = curr_status;
 }
 
 int gpio_handler_read(uint32_t gpio){
